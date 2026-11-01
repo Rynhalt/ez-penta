@@ -28,7 +28,9 @@ def server_status(base_url):
     """Return 'ready', 'loading', 'offline', or 'unknown'."""
     try:
         result = read_json(f"{base_url}/health", timeout=2)
-        return "ready" if result.get("status") == "ok" else "loading"
+        if not isinstance(result, dict):
+            return "unknown"
+        return {"ok": "ready", "loading": "loading"}.get(result.get("status"), "unknown")
     except HTTPError as error:
         return "loading" if error.code == 503 else "unknown"
     except (URLError, TimeoutError, OSError):
@@ -133,8 +135,9 @@ def main():
         log_path = None
         if args.save:
             Path("runs").mkdir(exist_ok=True)
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
             log_path = Path("runs") / f"session-{timestamp}.jsonl"
+            log_path.touch(exist_ok=False)
             print(f"Saving session data to {log_path} (local, git-ignored).")
 
         messages = []
@@ -160,7 +163,9 @@ def main():
             try:
                 result = complete(base_url, messages, args.max_tokens)
                 answer = result["choices"][0]["message"]["content"] or ""
-            except (HTTPError, URLError, TimeoutError, KeyError, IndexError, ValueError) as error:
+                if not isinstance(answer, str):
+                    raise ValueError("Expected a text response from the model")
+            except (HTTPError, URLError, OSError, KeyError, IndexError, ValueError, TypeError) as error:
                 messages.pop()  # Do not retain an unsuccessful request.
                 print(f"Request failed: {error}. Try /reset if the context is full.")
                 continue
@@ -178,14 +183,22 @@ def main():
                     "model": result.get("model", model_id),
                     "prompt": prompt,
                     "response": answer,
+                    "messages": messages.copy(),
                     "usage": result.get("usage", {}),
+                    "timings": result.get("timings", {}),
+                    "finish_reason": result["choices"][0].get("finish_reason"),
                     "settings": {"temperature": 0.2, "max_tokens": args.max_tokens},
                 }
-                with log_path.open("a", encoding="utf-8") as file:
-                    file.write(json.dumps(record, ensure_ascii=False) + "\n")
+                try:
+                    with log_path.open("a", encoding="utf-8") as file:
+                        file.write(json.dumps(record, ensure_ascii=False) + "\n")
+                except OSError as error:
+                    print(f"Could not save this response: {error}")
             messages.append({"role": "assistant", "content": answer})
             messages = messages[-2 * MAX_EXCHANGES:]
-    except (RuntimeError, HTTPError, URLError, KeyError, IndexError) as error:
+    except KeyboardInterrupt:
+        print()
+    except (RuntimeError, HTTPError, URLError, OSError, KeyError, IndexError, ValueError, TypeError) as error:
         print(f"Setup error: {error}")
         raise SystemExit(1) from error
     finally:
