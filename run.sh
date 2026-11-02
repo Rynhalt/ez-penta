@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    printf '%s\n' \
+        'Usage: bash run.sh [--setup-only | --limit 1-5 --max-tokens 512 --output-dir PATH]' \
+        'Installs missing macOS prerequisites, creates .venv, installs packages,' \
+        'signs in to Hugging Face if needed, and runs the AnswerCarefully experiment.' \
+        'Requires Homebrew and approved access to llm-jp/AnswerCarefully.'
+    exit 0
+fi
+
+setup_only=false
+if [[ "${1:-}" == "--setup-only" ]]; then
+    setup_only=true
+    shift
+    if [[ "$#" -ne 0 ]]; then
+        printf '%s\n' '--setup-only does not accept experiment options.' >&2
+        exit 1
+    fi
+fi
+
+if ! command -v python3.12 >/dev/null || ! command -v llama-server >/dev/null; then
+    if [[ "$(uname -s)" != "Darwin" ]] || ! command -v brew >/dev/null; then
+        printf '%s\n' 'Install Python 3.12 and llama-server first. On macOS, install Homebrew from https://brew.sh.' >&2
+        exit 1
+    fi
+    command -v python3.12 >/dev/null || brew install python@3.12
+    command -v llama-server >/dev/null || brew install llama.cpp
+fi
+
+if [[ ! -d .venv ]]; then
+    python3.12 -m venv .venv
+fi
+if ! .venv/bin/python -c 'import sys; raise SystemExit(sys.version_info[:2] != (3, 12))'; then
+    printf '%s\n' 'Existing .venv is not Python 3.12. Rename it and rerun; it will not be deleted automatically.' >&2
+    exit 1
+fi
+
+printf '%s\n' 'Installing project dependencies in .venv...'
+.venv/bin/python -m pip install --disable-pip-version-check --no-input --only-binary=:all: -r requirements.txt
+.venv/bin/python -m pip check
+if [[ "$setup_only" == true ]]; then
+    printf '%s\n' 'Setup complete. Run bash run.sh to start the experiment.'
+    exit 0
+fi
+
+# Credentials stay in Hugging Face's local store, never in project files.
+if ! .venv/bin/python -c 'from huggingface_hub import get_token; raise SystemExit(get_token() is None)'; then
+    if [[ ! -t 0 ]]; then
+        printf '%s\n' 'Run .venv/bin/hf auth login interactively, then rerun bash run.sh.' >&2
+        exit 1
+    fi
+    .venv/bin/hf auth login
+fi
+
+exec .venv/bin/python -u evaluate_answercarefully.py run "$@"

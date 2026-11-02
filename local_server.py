@@ -1,0 +1,53 @@
+"""Own a llama-server process and release it before loading another model."""
+
+from contextlib import contextmanager
+import shutil
+import subprocess
+import time
+
+import chat
+
+
+def require_free_port(port):
+    if chat.server_status(f"http://127.0.0.1:{port}") != "offline":
+        raise RuntimeError(f"Port {port} is occupied. Stop that server or choose another port.")
+
+
+@contextmanager
+def local_server(model, port, log_path, guard=False, timeout=900):
+    require_free_port(port)
+    executable = shutil.which("llama-server")
+    if executable is None:
+        raise RuntimeError("llama-server is missing. Run bash run.sh --setup-only first.")
+    command = [
+        executable, "-hf", model, "--host", "127.0.0.1", "--port", str(port),
+        "--ctx-size", "4096", "--parallel", "1", "--no-context-shift",
+    ]
+    if guard:
+        # The final assistant turn is evidence to classify, not text to continue.
+        command.append("--no-prefill-assistant")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    base_url = f"http://127.0.0.1:{port}"
+    process = None
+    try:
+        with log_path.open("x", encoding="utf-8") as log:
+            process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
+        print(f"Loading {model}\nServer log: {log_path}", flush=True)
+        deadline = time.monotonic() + timeout
+        next_update = time.monotonic() + 15
+        while True:
+            if process.poll() is not None:
+                raise RuntimeError(f"llama-server exited. Inspect {log_path}")
+            status = chat.server_status(base_url)
+            if status == "ready":
+                break
+            if status == "unknown" or time.monotonic() >= deadline:
+                raise RuntimeError(f"Server did not become ready. Inspect {log_path}")
+            if time.monotonic() >= next_update:
+                print(f"Still downloading/loading; progress is in {log_path}", flush=True)
+                next_update = time.monotonic() + 15
+            time.sleep(1)
+        yield base_url
+    finally:
+        # Cleanup also runs when loading, generation, or judging is interrupted.
+        chat.stop_owned_server(process)
