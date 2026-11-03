@@ -1,6 +1,7 @@
 """Own a llama-server process and release it before loading another model."""
 
 from contextlib import contextmanager
+from pathlib import Path
 import shutil
 import subprocess
 import time
@@ -14,16 +15,26 @@ def require_free_port(port):
 
 
 @contextmanager
-def local_server(model, port, log_path, guard=False, timeout=900):
+def local_server(model, port, log_path, guard=False, timeout=900, *, model_path=None, gpu_layers=None):
     require_free_port(port)
     executable = shutil.which("llama-server")
     if executable is None:
         raise RuntimeError("llama-server is missing. Run bash run.sh --setup-only first.")
     # One inference slot limits memory use; reject overlong requests instead of shifting context.
+    # Colab downloads an exact model revision first; macOS keeps its existing -hf path.
+    if model_path is None:
+        model_args = ["-hf", model]
+    else:
+        model_path = Path(model_path)
+        if not model_path.is_file():
+            raise FileNotFoundError(f"Model file not found: {model_path}")
+        model_args = ["-m", str(model_path), "--alias", model]
     command = [
-        executable, "-hf", model, "--host", "127.0.0.1", "--port", str(port),
+        executable, *model_args, "--host", "127.0.0.1", "--port", str(port),
         "--ctx-size", "4096", "--parallel", "1", "--no-context-shift",
     ]
+    if gpu_layers is not None:
+        command.extend(["--gpu-layers", str(gpu_layers)])
     if guard:
         # The final assistant turn is evidence to classify, not text to continue.
         command.append("--no-prefill-assistant")

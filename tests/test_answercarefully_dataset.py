@@ -31,6 +31,33 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(len(select_samples(rows, "revision", 6)), 6)
         self.assertEqual(len(select_samples(rows, "revision", 20)), 8)
 
+    def test_english_uses_translation_and_keeps_paired_source_and_japanese_reference(self):
+        rows = [original_row("first", "area"), original_row("second", "area")]
+        samples = select_samples(rows, "revision", 1, language="en")
+        self.assertEqual(len(samples), 1)
+        sample = samples[0]
+        self.assertEqual(sample.id, "first:en")
+        self.assertEqual(sample.input, rows[0]["meta-mlmc"]["text-English"])
+        self.assertEqual(sample.target, rows[0]["output"])
+        self.assertEqual(sample.metadata["language"], "en")
+        self.assertEqual(sample.metadata["reference_language"], "ja")
+        self.assertEqual(sample.metadata["source_id"], "first")
+        self.assertEqual(sample.metadata["original_prompt_ja"], rows[0]["text"])
+        self.assertEqual(sample.metadata["translation"], rows[0]["meta-mlmc"])
+        self.assertEqual(rows[0]["text"], "日本語の質問 first")
+
+    def test_missing_english_never_silently_falls_back_to_japanese(self):
+        for value in (None, "", "   ", 123):
+            row = original_row("missing", "area")
+            row["meta-mlmc"]["text-English"] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "en prompt for missing"):
+                select_samples([row], "revision", language="en")
+        row["meta-mlmc"] = None
+        with self.assertRaisesRegex(ValueError, "en prompt for missing"):
+            select_samples([row], "revision", language="en")
+        with self.assertRaisesRegex(ValueError, "language"):
+            select_samples([original_row("first", "area")], "revision", language="mixed")
+
     def test_empty_data_and_invalid_limits_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "no examples"):
             select_samples([], "revision")

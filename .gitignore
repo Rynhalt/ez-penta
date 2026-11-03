@@ -1,6 +1,7 @@
 .venv
 .venv-offloaded-*/
 __pycache__/
+.ipynb_checkpoints/
 *.pyc
 .DS_Store
 *.gguf

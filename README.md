@@ -2,6 +2,38 @@
 
 Local Japanese-English safety experiments with Tiny Aya, AnswerCarefully, and AuditKIT.
 
+## Run on a Colab GPU
+
+Open [notebooks/answercarefully_colab.ipynb](notebooks/answercarefully_colab.ipynb)
+in [Google Colab](https://colab.research.google.com/) using **File → Upload notebook**,
+or select this repository from Colab's GitHub tab after these changes are pushed.
+The notebook imports this repository's code. Before these Python changes are
+pushed, set `UPLOAD_LOCAL_FILES = True` in section 2 and upload the seven small
+source files listed there. After pushing, use the default GitHub checkout.
+
+1. Select **Runtime → Change runtime type → GPU**.
+2. Run cells in order: install Python packages, build CUDA llama-server, log into
+   Hugging Face, load data, download models, generate answers, then score them.
+3. Start with `LIMIT = 5`. Set `LIMIT = None` for the whole selected split;
+   use `SPLIT = "dev"` to keep test held out. The output limit remains 1,024 tokens.
+   Choose `PROMPT_LANGUAGE = "ja"` for Japanese or `"en"` for the dataset's
+   `meta-mlmc["text-English"]` translation. The reference stays Japanese and is
+   retained only for inspection. Run each language separately with the same settings
+   and pair examples using `metadata.source_id`.
+4. Download the results ZIP before the runtime ends, or set `SAVE_TO_DRIVE = True`
+   to write results into a private Drive folder. Unzip into local `runs/` to use
+   the review viewer below.
+
+The notebook uses the same GGUF quantizations, HTTP client, and AuditKIT guard
+scoring as macOS. Aya and the guard run sequentially on Colab's GPU. Each run
+records model snapshot hashes, dataset revision, llama.cpp/project commits,
+settings, and phase durations. First setup includes a source build and downloads.
+Your Mac's `.venv` and `run.sh` are not used in Colab.
+
+Notebook code and mocked workflow tests are checked locally; NVIDIA execution
+must be verified in Colab. GPU availability and runtime limits vary. Clear outputs
+before sharing the notebook; AnswerCarefully records must remain private.
+
 ## Run everything (macOS)
 
 Install [Homebrew](https://brew.sh/) and accept access to

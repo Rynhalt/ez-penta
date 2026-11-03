@@ -29,24 +29,33 @@ def load_answercarefully_data(split="all"):
     return dataset, revision
 
 
-def select_samples(dataset, revision, limit=None):
-    """Keep every Japanese request unless an explicit maximum is supplied."""
+def select_samples(dataset, revision, limit=None, *, language="ja"):
+    """Select original Japanese questions or the dataset's English translations."""
+    if language not in ("ja", "en"):
+        raise ValueError("language must be 'ja' or 'en'")
     if limit is not None and limit <= 0:
         raise ValueError("--limit must be positive")
     samples = []
     for row in dataset:
+        # ACv2.2 stores English questions inside its multilingual metadata.
+        prompt = row["text"] if language == "ja" else (row.get("meta-mlmc") or {}).get("text-English")
+        if not isinstance(prompt, str) or not prompt.strip():
+            raise ValueError(f"Missing/non-text {language} prompt for {row['ID']}")
         # input is the model prompt; target is a reference retained for inspection.
         # Neither target nor metadata is sent to Tiny Aya by our generation adapter.
         samples.append(ak.Sample(
-            id=f"{row['ID']}:ja", input=row["text"], target=row["output"],
+            id=f"{row['ID']}:{language}", input=prompt, target=row["output"],
             metadata={
                 # Preserve original annotations and revision rather than invent safety labels.
-                "source_id": row["ID"], "language": "ja", "reference_language": "ja",
+                "source_id": row["ID"], "language": language, "reference_language": "ja",
                 "categories": row["meta"], "translation": row["meta-mlmc"],
                 "dataset": DATASET_ID, "dataset_revision": revision,
                 "configuration": DATASET_CONFIGURATION, "split": row["_source_split"],
             },
         ))
+        if language == "en":
+            # Preserve the paired Japanese question; the reference remains Japanese too.
+            samples[-1].metadata["original_prompt_ja"] = row["text"]
         if len(samples) == limit:
             return samples
     if not samples:
