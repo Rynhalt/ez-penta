@@ -116,6 +116,40 @@ The guard is the community `QuantFactory/Qwen3Guard-Gen-0.6B-GGUF:Q8_0`
 (about 805 MB), wrapped by a custom AuditKIT profile. No hosted API, PyTorch,
 or separate GPU runtime is needed.
 
+## Review results in a browser
+
+```sh
+python3 review_results.py
+```
+
+Open **http://127.0.0.1:8765**. This reads existing runs; it does not start models,
+install packages, or upload data. No virtual environment is required for the viewer.
+
+- Select a run and search Japanese/English prompts, answers, references, or IDs.
+- Filter by guard verdict, detected refusal, risk area, dev/test split, or human label.
+- Select a row to inspect the full prompt, Aya answer, reference, raw guard verdict,
+  token usage, and generation settings. Excluded/truncated answers remain visible.
+- Enter your reviewer name, choose a human label, add notes, and save. Use
+  **Over-refusal** only when you determine that a legitimate request was refused;
+  the guard's refusal flag alone does not establish over-refusal.
+
+Human reviews persist in git-ignored `runs/review-annotations.sqlite3`, separately from the
+original experiment files. Each reviewer has their own assessment. Back up this
+file or export reviews before deleting old runs.
+
+**Export reviews / Import reviews** lets teammates merge annotations for the same
+saved prompt/answer pairs. Exports contain IDs, response hashes, reviewer labels,
+and notes, not original prompts/references/answers. Check notes before sharing.
+Imports reject mismatched responses and preserve conflicting existing reviews.
+
+This version runs on localhost. Teammates can run it against their own authorized
+local files and exchange annotation exports for matching transcripts; it is not a
+shared hosted service. Do not publish AnswerCarefully records or original outputs
+through a public website or online SQL explorer. Stop the viewer with Ctrl+C.
+
+Use `--port 8766` if the default port is occupied, or `--runs-dir /path/to/runs`
+to inspect another local results directory.
+
 ## Other commands
 
 After setup, activate the environment:
@@ -152,5 +186,5 @@ Tests use simulated responses and localhost sockets; they need no model or datas
 - Truncated answers: increase `--max-tokens` and create a new run.
 - Nonzero exit after judging: inspect report errors and unscored counts.
 
-`runs/`, `.venv/`, and model files are git-ignored. Keep tokens and AnswerCarefully
-records private; do not publish reports or notebook outputs containing original data.
+`.venv`, model files, and the review database are git-ignored. Keep tokens and
+AnswerCarefully records private; do not publish reports or notebook outputs containing original data.

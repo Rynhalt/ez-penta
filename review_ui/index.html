@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ez-penta · Response review</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="ez-penta review home"><span class="brand-mark">ez</span><span>penta<span class="brand-divider">/</span><span class="brand-area">Review workspace</span></span></a>
+    <div class="header-right"><span class="local-indicator">Local workspace</span><label class="reviewer-field">Reviewer<input id="reviewer" placeholder="Your name" maxlength="64" autocomplete="name"></label></div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">ANSWERCAREFULLY · HUMAN REVIEW</p><h1>A closer look at every answer.</h1><p class="intro-copy">Inspect model responses, check guard decisions, and record your own judgment.</p></div>
+      <div class="review-progress"><span id="reviewProgressText">No run selected</span><progress id="reviewProgress" value="0" max="1" aria-label="Human review progress"></progress><small>Human labels stay separate from automated verdicts.</small></div>
+    </section>
+
+    <section class="run-toolbar" aria-label="Run and annotations">
+      <label class="run-picker"><span class="field-label">EVALUATION RUN</span><select id="runSelect" aria-label="Evaluation run"><option>Loading runs…</option></select></label>
+      <button id="reloadButton" class="button secondary">Reload files</button>
+      <div class="toolbar-spacer"></div>
+      <button id="exportButton" class="button secondary">Export reviews ↓</button>
+      <label class="button secondary import-button">Import reviews ↑<input id="importFile" type="file" accept="application/json,.json"></label>
+    </section>
+
+    <div id="notice" class="notice" role="status" hidden></div>
+
+    <section class="stats" aria-label="Run overview">
+      <button class="stat-card" data-verdict=""><span class="stat-label">Responses</span><strong id="totalCount">—</strong><small>All saved generations</small></button>
+      <button class="stat-card unsafe-card" data-verdict="Unsafe"><span class="stat-label"><span class="dot red"></span>Guard unsafe</span><strong id="unsafeCount">—</strong><small id="unsafeRate">Of scored responses</small></button>
+      <button class="stat-card" data-verdict="Safe"><span class="stat-label"><span class="dot green"></span>Guard safe</span><strong id="safeCount">—</strong><small>Not a helpfulness verdict</small></button>
+      <div class="stat-card"><span class="stat-label"><span class="dot amber"></span>Unscored</span><strong id="unscoredCount">—</strong><small>Uncertain, missing, or errors</small></div>
+      <button class="stat-card" data-verdict="Excluded"><span class="stat-label">Excluded</span><strong id="excludedCount">—</strong><small>Incomplete generations</small></button>
+      <button class="stat-card" id="overRefusalCard"><span class="stat-label"><span class="dot purple"></span>Human over-refusal</span><strong id="overRefusalCount">—</strong><small>Only reviewer-confirmed labels</small></button>
+    </section>
+
+    <section class="filter-bar" aria-label="Filter responses">
+      <label class="search-field"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search prompts, answers, translations, or IDs" aria-label="Search responses"></label>
+      <select id="verdictFilter" aria-label="Guard verdict"><option value="">All guard verdicts</option><option>Unsafe</option><option>Safe</option><option>Controversial</option><option>Unparsed</option><option>Error</option><option>Excluded</option><option>Pending</option><option>Mismatched</option></select>
+      <select id="riskFilter" aria-label="Risk area"><option value="">All risk areas</option></select>
+      <select id="refusalFilter" aria-label="Detected refusal"><option value="">Any refusal status</option><option value="Yes">Guard detected refusal</option><option value="No">Guard detected no refusal</option></select>
+      <select id="reviewFilter" aria-label="Human review label"><option value="">All human reviews</option></select>
+      <select id="splitFilter" aria-label="Dataset split"><option value="">All splits</option><option value="dev">Development</option><option value="test">Test</option></select>
+      <button id="clearFilters" class="text-button">Reset</button>
+    </section>
+
+    <div class="workspace">
+      <section class="results-panel" aria-label="Response browser">
+        <div class="panel-heading"><div><span class="section-heading">Responses</span><span id="matchCount" class="muted">Loading…</span></div><span class="subtle">Select a row to inspect</span></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Prompt / response</th><th>Guard</th><th>Human review</th></tr></thead><tbody id="resultsBody"></tbody></table>
+          <div id="emptyResults" class="empty-state" hidden><span class="empty-icon">⌕</span><h2>No matching responses</h2><p>Change the filters or reset your search.</p></div>
+        </div>
+        <div class="pagination"><span id="pageInfo" class="muted">—</span><div><button id="previousPage" class="button secondary small">← Previous</button><button id="nextPage" class="button secondary small">Next →</button></div></div>
+      </section>
+
+      <aside id="detailPanel" class="detail-panel" aria-label="Selected response">
+        <div class="detail-empty"><span class="detail-symbol">↗</span><h2>Read beyond the verdict.</h2><p>Choose a response to compare the prompt, model answer, reference, and guard assessment.</p><p class="subtle">A detected refusal is not automatically an over-refusal. Make that distinction in your human review.</p></div>
+      </aside>
+    </div>
+    <footer>ez-penta / Local review · No model inference or external services · Original records are never modified</footer>
+  </main>
+</body>
+</html>

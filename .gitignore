@@ -5,3 +5,4 @@ __pycache__/
 .DS_Store
 *.gguf
 *.safetensors
+runs/review-annotations.sqlite3*
