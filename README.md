@@ -8,11 +8,11 @@ Open [notebooks/answercarefully_colab.ipynb](notebooks/answercarefully_colab.ipy
 in [Google Colab](https://colab.research.google.com/) using **File → Upload notebook**,
 or select this repository from Colab's GitHub tab after these changes are pushed.
 The notebook imports this repository's code. Before these Python changes are
-pushed, set `UPLOAD_LOCAL_FILES = True` in section 2 and upload the seven small
+pushed, set `UPLOAD_LOCAL_FILES = True` in section 2 and upload the eight small
 source files listed there. After pushing, use the default GitHub checkout.
 
 1. Select **Runtime → Change runtime type → GPU**.
-2. Run cells in order: install Python packages, build CUDA llama-server, log into
+2. Run cells in order: install Python packages, restore/build CUDA llama-server, log into
    Hugging Face, load data, download models, generate answers, then score them.
 3. Start with `LIMIT = 5`. Set `LIMIT = None` for the whole selected split;
    use `SPLIT = "dev"` to keep test held out. The output limit remains 1,024 tokens.
@@ -29,6 +29,17 @@ scoring as macOS. Aya and the guard run sequentially on Colab's GPU. Each run
 records model snapshot hashes, dataset revision, llama.cpp/project commits,
 settings, and phase durations. First setup includes a source build and downloads.
 Your Mac's `.venv` and `run.sh` are not used in Colab.
+
+Section 3 defaults to `CACHE_BUILD_IN_DRIVE = True`. It saves the completed server,
+shared libraries, and build log in **My Drive/ez-penta-cache/llama-cuda/**.
+Fresh runtimes restore a matching build and validate file hashes and CUDA device
+detection before using it. The cache key includes the source commit, build options,
+GPU, CUDA/compiler versions, CPU, and Linux environment. A mismatch or failed check
+rebuilds automatically. `FORCE_REBUILD = True` requests a clean build; disable it
+afterward to reuse the cache. Compilation still happens the first time, and partial
+compilation is not persisted. A previously completed local build can be cached by
+rerunning section 3; CMake reuses unchanged outputs. This is separate from
+`SAVE_TO_DRIVE`, which controls experiment results.
 
 Notebook code and mocked workflow tests are checked locally; NVIDIA execution
 must be verified in Colab. GPU availability and runtime limits vary. Clear outputs

@@ -33,15 +33,17 @@ class ColabNotebookTests(unittest.TestCase):
         self.assertEqual(len(matches), 1, f"Expected one cell containing {text!r}")
         return matches[0]
 
-    def test_notebook_is_valid_python_without_saved_outputs(self):
+    def test_notebook_is_valid_python_with_valid_execution_state(self):
         self.assertEqual(self.notebook["nbformat"], 4)
         ids = [cell["id"] for cell in self.notebook["cells"]]
         self.assertEqual(len(ids), len(set(ids)))
         for index, cell in enumerate(self.notebook["cells"]):
             if cell["cell_type"] == "code":
                 compile("".join(cell["source"]), f"{NOTEBOOK}:cell-{index}", "exec")
-                self.assertEqual(cell["outputs"], [])
-                self.assertIsNone(cell["execution_count"])
+                # Users can save progress from Colab; keep their outputs intact.
+                self.assertIsInstance(cell["outputs"], list)
+                self.assertTrue(cell["execution_count"] is None
+                                or isinstance(cell["execution_count"], int))
 
     def test_notebook_phases_preserve_saved_answers_and_unknown_verdicts(self):
         lifecycle = []
