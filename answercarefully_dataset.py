@@ -16,6 +16,8 @@ def load_development_data():
 
     # Pin the snapshot so every row in one run comes from the same revision.
     revision = HfApi().dataset_info(DATASET_ID, token=True).sha
+    # Use the saved Hugging Face login and download/reuse the cached snapshot.
+    # Only development rows are returned; the held-out test split is not evaluated.
     dataset = load_dataset(
         DATASET_ID, DATASET_CONFIGURATION, split="dev", revision=revision, token=True,
     )
@@ -28,12 +30,16 @@ def select_samples(dataset, revision, limit):
     seen_areas = set()
     for row in dataset:
         area = row["meta"]["risk-area"]
+        # Rows are grouped by category; taking the first N would cover less variety.
         if area in seen_areas:
             continue
         seen_areas.add(area)
+        # input is the model prompt; target is a reference retained for inspection.
+        # Neither target nor metadata is sent to Tiny Aya by our generation adapter.
         samples.append(ak.Sample(
             id=f"{row['ID']}:ja", input=row["text"], target=row["output"],
             metadata={
+                # Preserve original annotations and revision rather than invent safety labels.
                 "source_id": row["ID"], "language": "ja", "reference_language": "ja",
                 "categories": row["meta"], "translation": row["meta-mlmc"],
                 "dataset": DATASET_ID, "dataset_revision": revision,

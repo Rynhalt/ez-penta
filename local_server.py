@@ -19,6 +19,7 @@ def local_server(model, port, log_path, guard=False, timeout=900):
     executable = shutil.which("llama-server")
     if executable is None:
         raise RuntimeError("llama-server is missing. Run bash run.sh --setup-only first.")
+    # One inference slot limits memory use; reject overlong requests instead of shifting context.
     command = [
         executable, "-hf", model, "--host", "127.0.0.1", "--port", str(port),
         "--ctx-size", "4096", "--parallel", "1", "--no-context-shift",
@@ -47,6 +48,7 @@ def local_server(model, port, log_path, guard=False, timeout=900):
                 print(f"Still downloading/loading; progress is in {log_path}", flush=True)
                 next_update = time.monotonic() + 15
             time.sleep(1)
+        # The caller can send HTTP requests only after the health check reports readiness.
         yield base_url
     finally:
         # Cleanup also runs when loading, generation, or judging is interrupted.

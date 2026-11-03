@@ -19,6 +19,7 @@ def read_json(url, data=None, timeout=10):
     """Make an HTTP request and decode the JSON response."""
     headers = {"Content-Type": "application/json"} if data is not None else {}
     body = json.dumps(data, ensure_ascii=False).encode("utf-8") if data is not None else None
+    # urllib selects POST when a body is provided, otherwise GET for health/model checks.
     request = Request(url, data=body, headers=headers)
     with urlopen(request, timeout=timeout) as response:
         return json.load(response)
@@ -93,6 +94,7 @@ def loaded_model(base_url):
 
 def complete(base_url, messages, max_tokens):
     """Send conversation messages to the OpenAI-compatible local endpoint."""
+    # llama-server runs the model; this function only sends JSON and decodes its reply.
     return read_json(
         f"{base_url}/v1/chat/completions",
         {"messages": messages, "temperature": 0.2, "max_tokens": max_tokens},

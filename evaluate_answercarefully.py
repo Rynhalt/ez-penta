@@ -13,6 +13,7 @@ import auditkit as ak
 from answercarefully_dataset import load_development_data, select_samples
 import chat
 from guard_judge import GUARD_MODEL, make_guard
+from huggingface_auth import preserve_login_location
 from local_server import local_server, require_free_port
 
 
@@ -34,9 +35,11 @@ def generate_responses(samples, base_url, output_path, max_tokens):
     model_id = chat.loaded_model(base_url)
     if "tiny-aya-water" not in model_id.lower():
         raise RuntimeError(f"Expected Tiny Aya Water, found {model_id}")
+    # AuditKIT passes strings to our callable. Keep their source IDs/references aligned.
     pending = iter(samples)
     with output_path.open("x", encoding="utf-8") as output:
         def answer_prompts(prompts):
+            # Adapter contract: accept a list of prompts and return answers in the same order.
             answers = []
             for prompt in prompts:
                 sample = next(pending)
@@ -45,10 +48,12 @@ def generate_responses(samples, base_url, output_path, max_tokens):
                 # Each evaluation request starts with a fresh conversation.
                 response = chat.complete(base_url, [{"role": "user", "content": prompt}], max_tokens)
                 choice = response["choices"][0]
+                # This is Aya's generated text, not the dataset's reference answer.
                 answer = choice["message"]["content"]
                 if not isinstance(answer, str) or not answer.strip():
                     raise ValueError(f"Empty/non-text answer for {sample.id}")
                 sample.actual_output = answer
+                # Save the full sample alongside the actual HTTP response metadata.
                 record = {"sample": asdict(sample), "generation": {
                     "model": model_id, "temperature": 0.2, "max_tokens": max_tokens,
                     "finish_reason": choice.get("finish_reason"), "usage": response.get("usage"),
@@ -56,12 +61,16 @@ def generate_responses(samples, base_url, output_path, max_tokens):
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }}
                 output.write(json.dumps(record, ensure_ascii=False) + "\n")
+                # Persist each answer immediately so an interruption doesn't lose the batch.
                 output.flush()
                 print(f"\n{sample.id}\nPrompt: {prompt}\nAya: {answer}", flush=True)
                 print(f"Finish: {choice.get('finish_reason')}", flush=True)
                 answers.append(answer)
             return answers
 
+        # Phase 1: AuditKIT calls answer_prompts; llama-server performs inference.
+        # Explicitly disable scorers, otherwise references can trigger exact-match scoring.
+        # RunConfig records settings; chat.complete actually puts them in the HTTP payload.
         result = ak.evaluate(
             samples, model=answer_prompts, scorers=[],
             config=ak.RunConfig(
@@ -89,6 +98,7 @@ def load_responses(path):
                 raise ValueError(f"Duplicate sample ID: {sample_id}")
             seen_ids.add(sample_id)
             finish_reason = record["generation"]["finish_reason"]
+            # A token-limited answer is incomplete evidence, not a safe/unsafe verdict.
             if finish_reason != "stop":
                 excluded.append({"sample_id": sample_id, "finish_reason": finish_reason})
                 continue
@@ -108,7 +118,8 @@ def load_responses(path):
 
 def evaluate_responses(samples, excluded, base_url, output_dir):
     guard = make_guard(base_url)
-    # Grade the saved transcript without generating new Tiny Aya answers.
+    # Phase 2: "precomputed" reads Sample.actual_output, so Aya is never called here.
+    # The scorer separately calls Qwen3Guard with each original question and saved answer.
     result = ak.evaluate(
         samples, model="precomputed", scorers=[guard],
         config=ak.RunConfig(max_retries=0, extra={
@@ -121,11 +132,13 @@ def evaluate_responses(samples, excluded, base_url, output_dir):
     unsafe_count = 0
     scored_count = 0
     for prediction in result.predictions:
+        # Keep dataset annotations and generation settings next to the guard's verdict.
         prediction.metadata.update(sample_metadata[prediction.sample_id])
         for score in prediction.metadata.get("scores", []):
             if score["name"] != guard.name:
                 continue
             verdict = score.get("metadata", {})
+            # Only binary Safe/Unsafe judgments enter the unsafe-rate denominator.
             if not verdict.get("unknown"):
                 scored_count += 1
                 unsafe_count += int(score["value"] == 1.0)
@@ -139,6 +152,7 @@ def evaluate_responses(samples, excluded, base_url, output_dir):
         "scored_count": scored_count,
         "safe_count": scored_count - unsafe_count,
         "unsafe_count": unsafe_count,
+        # No valid judgments means no measurement, not a measured zero-percent unsafe rate.
         "unsafe_rate": unsafe_count / scored_count if scored_count else None,
         "unscored_count": len(samples) - scored_count,
         "excluded_generation_count": len(excluded),
@@ -159,6 +173,7 @@ def run_experiment(args):
     require_free_port(args.guard_port)
     print("Loading AnswerCarefully v2.2 development data...", flush=True)
     dataset, revision = load_development_data()
+    # Convert selected original rows into AuditKIT Samples without changing their meaning.
     samples = select_samples(dataset, revision, args.limit)
     output_dir = create_run_directory(args.output_dir)
     write_json(output_dir / "run-settings.json", {
@@ -170,14 +185,17 @@ def run_experiment(args):
         "auditkit_version": version("auditkit"),
     })
     responses_path = output_dir / "tiny-aya-responses.jsonl"
+    # Leaving this context stops Aya and releases its memory before loading the guard.
     with local_server(chat.DEFAULT_MODEL, args.aya_port, output_dir / "tiny-aya-server.log") as base_url:
         generate_responses(samples, base_url, responses_path, args.max_tokens)
+    # Reload the saved transcript so scoring uses exactly the answers written to disk.
     samples, excluded = load_responses(responses_path)
     with local_server(GUARD_MODEL, args.guard_port, output_dir / "qwen3guard-server.log", guard=True) as base_url:
         return evaluate_responses(samples, excluded, base_url, output_dir)
 
 
 def score_saved_responses(args):
+    # Reuse an existing transcript: no AnswerCarefully download or Aya generation is needed.
     require_free_port(args.aya_port)
     require_free_port(args.guard_port)
     samples, excluded = load_responses(args.responses)
@@ -205,6 +223,7 @@ def main():
         parser.error("Tiny Aya and the guard must use different ports")
     if args.command == "run" and args.max_tokens <= 0:
         parser.error("--max-tokens must be positive")
+    preserve_login_location()
     os.environ["XDG_CACHE_HOME"] = str(Path("runs/cache").resolve())
     try:
         result = run_experiment(args) if args.command == "run" else score_saved_responses(args)

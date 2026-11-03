@@ -17,6 +17,12 @@ bash run.sh
 The launcher installs missing Python 3.12 / llama.cpp through Homebrew, creates
 `.venv`, installs pinned dependencies, and prompts for Hugging Face login if needed.
 Use a read-capable token; do not put it in source files.
+An existing Hugging Face login is reused. If none is found, the launcher prompts
+for a token with hidden input and saves it using Hugging Face's normal login store.
+
+On macOS, `.venv` links to a per-project environment under
+`~/Library/Application Support/ez-penta/venvs/`. This keeps installed packages out
+of iCloud-managed Desktop/Documents folders, where offloaded files can stall Python.
 
 It then loads three Japanese development examples, starts Tiny Aya, saves its
 answers, stops Aya, starts Qwen3Guard, evaluates the saved answers with AuditKIT,
@@ -38,6 +44,41 @@ bash run.sh --limit 3 --max-tokens 512 --output-dir runs/my-experiment
 Each teammate creates their own `.venv`; do not copy it. Python 3.12 is required
 by the launcher (tested with 3.12.9). Activation selects that environment's
 interpreter; it does not install Python.
+
+## Program flow
+
+```text
+bash run.sh
+  |
+  +-- Install dependencies and reuse/prompt for Hugging Face login
+  |
+  +-- AnswerCarefully v2.2 (dev) -> select 3 Japanese examples
+  |     ak.Sample(input=question, target=reference, metadata=source categories)
+  |
+  +-- Start Tiny Aya through llama-server (localhost:8080)
+  |     AuditKIT: ak.evaluate(samples, model=answer_prompts, scorers=[])
+  |       -> chat.complete([{role: "user", content: question}])
+  |       -> HTTP POST /v1/chat/completions -> Tiny Aya generates an answer
+  |       <- JSON response: choices[0].message.content
+  |     Save question + reference + actual answer -> tiny-aya-responses.jsonl
+  |
+  +-- Stop Tiny Aya; exclude incomplete answers from judging
+  |
+  +-- Start Qwen3Guard through llama-server (localhost:8081)
+  |     AuditKIT: ak.evaluate(saved_samples, model="precomputed", scorers=[guard])
+  |       -> GuardJudge -> our LocalGuard HTTP adapter
+  |       -> Send [user: original question, assistant: saved Aya answer]
+  |       <- Qwen3Guard verdict: Safety / Categories / Refusal
+  |     Parse verdict and aggregate -> AuditKIT RunResult
+  |
+  +-- Save auditkit-guard-results.json + summary.json; stop the guard
+```
+
+AuditKIT coordinates both phases. The first generates answers without scoring;
+the second scores those exact saved answers without calling Tiny Aya again.
+Each question starts a fresh conversation. The reference and source metadata are
+retained for inspection but are sent to neither model. The guard judges the
+question/answer pair, not whether Aya's wording matches the reference.
 
 ## Results
 
@@ -80,7 +121,6 @@ python -m unittest discover -s tests -v
 
 - `answercarefully_dataset.py`: previews original ACv2.2 development records.
 - `chat.py`: interactive chat; `/reset` clears history, `/exit` quits.
-- `auditkit_demo.py`: five-question exact-match demo; needs Aya running on port 8080.
 - `evaluate_answercarefully.py`: experiment commands, without reinstalling packages.
 
 Rerun the experiment or judge previously saved responses:

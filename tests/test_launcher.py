@@ -13,12 +13,19 @@ if [[ "${1:-}" == "-m" && "${2:-}" == "venv" ]]; then
     mkdir -p "$3/bin"
     cp "$0" "$3/bin/python"
 elif [[ "${1:-}" == "-c" ]]; then
+    if [[ "$2" == *"hashlib"* ]]; then
+        printf '%s\\n' 'test-workspace'
+        exit 0
+    fi
     if [[ "$2" == *"get_token"* ]]; then
         exit "${BOOTSTRAP_NO_TOKEN:-0}"
     fi
     exit "${BOOTSTRAP_BAD_VERSION:-0}"
 elif [[ "${1:-}" == "-m" && "${2:-}" == "pip" && "${3:-}" == "install" ]]; then
     exit "${BOOTSTRAP_INSTALL_FAILURE:-0}"
+elif [[ "${1:-}" == "huggingface_auth.py" && "${BOOTSTRAP_NO_TOKEN:-0}" == "1" ]]; then
+    printf '%s\\n' 'No saved login. Run .venv/bin/hf auth login in your terminal.' >&2
+    exit 1
 fi
 """
 
@@ -40,6 +47,7 @@ class LauncherTests(unittest.TestCase):
         self.environment = {
             **os.environ, "PATH": f"{self.bin_dir}:{os.environ['PATH']}",
             "BOOTSTRAP_CALLS": str(self.calls),
+            "EZ_PENTA_ENV_ROOT": str(self.root / "local-environments"),
         }
 
     def launch(self, *args, **environment):
@@ -53,7 +61,12 @@ class LauncherTests(unittest.TestCase):
     def test_setup_creates_environment_and_checks_packages_without_running_models(self):
         result, calls = self.launch("--setup-only")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("-m venv .venv", calls)
+        self.assertIn("-m venv ", calls)
+        if os.uname().sysname == "Darwin":
+            self.assertTrue((self.root / ".venv").is_symlink())
+            self.assertTrue((self.root / ".venv").resolve().is_relative_to(
+                (self.root / "local-environments").resolve()
+            ))
         self.assertIn("--only-binary=:all:", calls)
         self.assertIn("-m pip check", calls)
         self.assertNotIn("evaluate_answercarefully", calls)
@@ -61,6 +74,7 @@ class LauncherTests(unittest.TestCase):
     def test_default_launch_forwards_experiment_options(self):
         result, calls = self.launch("--limit", "1", "--max-tokens", "256")
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("huggingface_auth.py", calls)
         self.assertIn("-u evaluate_answercarefully.py run --limit 1 --max-tokens 256", calls)
 
     def test_failed_install_does_not_start_experiment(self):

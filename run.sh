@@ -31,8 +31,20 @@ if ! command -v python3.12 >/dev/null || ! command -v llama-server >/dev/null; t
     command -v llama-server >/dev/null || brew install llama.cpp
 fi
 
-if [[ ! -d .venv ]]; then
-    python3.12 -m venv .venv
+if [[ ! -e .venv && ! -L .venv ]]; then
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        # Keep installed packages outside iCloud-managed Desktop/Documents folders.
+        environment_root="${EZ_PENTA_ENV_ROOT:-$HOME/Library/Application Support/ez-penta/venvs}"
+        workspace_id=$(python3.12 -c 'import hashlib, sys; print(hashlib.sha256(sys.argv[1].encode()).hexdigest()[:12])' "$PWD")
+        environment_path="$environment_root/$workspace_id-python3.12"
+        mkdir -p "$environment_root"
+        if [[ ! -d "$environment_path" ]]; then
+            python3.12 -m venv "$environment_path"
+        fi
+        ln -s "$environment_path" .venv
+    else
+        python3.12 -m venv .venv
+    fi
 fi
 if ! .venv/bin/python -c 'import sys; raise SystemExit(sys.version_info[:2] != (3, 12))'; then
     printf '%s\n' 'Existing .venv is not Python 3.12. Rename it and rerun; it will not be deleted automatically.' >&2
@@ -47,13 +59,7 @@ if [[ "$setup_only" == true ]]; then
     exit 0
 fi
 
-# Credentials stay in Hugging Face's local store, never in project files.
-if ! .venv/bin/python -c 'from huggingface_hub import get_token; raise SystemExit(get_token() is None)'; then
-    if [[ ! -t 0 ]]; then
-        printf '%s\n' 'Run .venv/bin/hf auth login interactively, then rerun bash run.sh.' >&2
-        exit 1
-    fi
-    .venv/bin/hf auth login
-fi
+# Reuse the saved login; the helper prompts only when no credential is available.
+.venv/bin/python huggingface_auth.py
 
 exec .venv/bin/python -u evaluate_answercarefully.py run "$@"
