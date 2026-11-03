@@ -2,7 +2,6 @@
 .venv-offloaded-*/
 __pycache__/
 *.pyc
-runs/
 .DS_Store
 *.gguf
 *.safetensors
