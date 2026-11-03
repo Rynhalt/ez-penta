@@ -5,7 +5,8 @@ cd "$(dirname "$0")"
 
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     printf '%s\n' \
-        'Usage: bash run.sh [--setup-only | --limit 1-5 --max-tokens 512 --output-dir PATH]' \
+        'Usage: bash run.sh [--setup-only | --split all|dev|test --limit N --max-tokens 1024 --output-dir PATH]' \
+        'By default, evaluates all 1,800 Japanese ACv2.2 dev and test prompts.' \
         'Installs missing macOS prerequisites, creates .venv, installs packages,' \
         'signs in to Hugging Face if needed, and runs the AnswerCarefully experiment.' \
         'Requires Homebrew and approved access to llm-jp/AnswerCarefully.'

@@ -36,9 +36,11 @@ def guard_messages(prompt, output, assess):
 
 
 class LocalGuard(Model):
-    def __init__(self, base_url, model_id):
+    def __init__(self, base_url, model_id, total=None):
         self.base_url = base_url
         self.name = model_id
+        self.total = total
+        self.completed_count = 0
 
     def generate(self, requests):
         # AuditKIT's GuardJudge calls this transport to run the separate guard model.
@@ -57,13 +59,16 @@ class LocalGuard(Model):
                 raise ValueError("Guard did not return text")
             # Wrap HTTP text in AuditKIT's result type; the profile parses the verdict next.
             results.append(Result_(completions=[Generated(text=text)]))
+            self.completed_count += 1
+            if self.total is not None:
+                print(f"Guard replies received: {self.completed_count}/{self.total}", flush=True)
         return results
 
 
-def make_guard(base_url):
+def make_guard(base_url, total=None):
     model_id = chat.loaded_model(base_url)
     if "qwen3guard-gen-0.6b" not in model_id.lower():
         raise RuntimeError(f"Expected Qwen3Guard-Gen-0.6B, found {model_id}")
     # A profile defines this guard's input format and how its text becomes a score.
     profile = {"id": "qwen3guard_response_v1", "build_messages": guard_messages, "parse": parse_guard}
-    return ak.GuardJudge(profile=profile, judge_model=LocalGuard(base_url, model_id), max_tokens=128)
+    return ak.GuardJudge(profile=profile, judge_model=LocalGuard(base_url, model_id, total), max_tokens=128)

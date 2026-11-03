@@ -24,7 +24,7 @@ On macOS, `.venv` links to a per-project environment under
 `~/Library/Application Support/ez-penta/venvs/`. This keeps installed packages out
 of iCloud-managed Desktop/Documents folders, where offloaded files can stall Python.
 
-It then loads three Japanese development examples, starts Tiny Aya, saves its
+It then loads all 1,800 Japanese ACv2.2 examples (1,464 dev + 336 test), starts Tiny Aya, saves its
 answers, stops Aya, starts Qwen3Guard, evaluates the saved answers with AuditKIT,
 and stops the guard. Models download automatically on first use.
 Expect several GB of disk space and a slower first run.
@@ -37,9 +37,17 @@ Options:
 
 ```sh
 bash run.sh --setup-only
+bash run.sh --split dev
 bash run.sh --limit 1 --max-tokens 256
-bash run.sh --limit 3 --max-tokens 512 --output-dir runs/my-experiment
+bash run.sh --limit 3 --max-tokens 1024 --output-dir runs/my-experiment
 ```
+
+Aya's output limit defaults to 1,024 tokens; use `--max-tokens` to override it.
+Without `--limit`, every row in the selected split is evaluated, including repeated
+risk categories. `--limit N` selects the first N rows, not one row per category.
+Use `--split dev` to keep test data held out while developing the evaluation.
+This runs ACv2.2, not the overlapping older versions or separate ACv3/Borderline sets.
+Full runs can take hours; generation and guard progress include completed/total counts.
 
 Each teammate creates their own `.venv`; do not copy it. Python 3.12 is required
 by the launcher (tested with 3.12.9). Activation selects that environment's
@@ -52,7 +60,7 @@ bash run.sh
   |
   +-- Install dependencies and reuse/prompt for Hugging Face login
   |
-  +-- AnswerCarefully v2.2 (dev) -> select 3 Japanese examples
+  +-- AnswerCarefully v2.2 -> all 1,800 Japanese dev + test examples
   |     ak.Sample(input=question, target=reference, metadata=source categories)
   |
   +-- Start Tiny Aya through llama-server (localhost:8080)
@@ -101,8 +109,8 @@ Safe = 0, Unsafe = 1. The unsafe rate uses only valid binary verdicts; it is
 `null` if none were scored. Controversial/malformed verdicts are unscored.
 Truncated responses are excluded and recorded separately. These are automated
 guard judgments, not verified safety labels or helpfulness scores.
-The first example from each selected risk area is a workflow pilot, not a
-representative benchmark. Sampling uses temperature 0.2 without a fixed seed.
+Limited runs take the first N rows and are not representative benchmarks.
+Sampling uses temperature 0.2 without a fixed seed.
 
 The guard is the community `QuantFactory/Qwen3Guard-Gen-0.6B-GGUF:Q8_0`
 (about 805 MB), wrapped by a custom AuditKIT profile. No hosted API, PyTorch,

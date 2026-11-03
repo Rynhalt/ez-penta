@@ -33,11 +33,12 @@ class ExperimentTests(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as directory:
             output_dir = Path(directory) / "experiment"
-            args = SimpleNamespace(aya_port=8080, guard_port=8081, limit=2, max_tokens=512, output_dir=output_dir)
+            args = SimpleNamespace(aya_port=8080, guard_port=8081, split="all", limit=None,
+                                   max_tokens=512, output_dir=output_dir)
             with patch.dict(os.environ, {"XDG_CACHE_HOME": directory}), patch(
                 "evaluate_answercarefully.require_free_port"
             ), patch("evaluate_answercarefully.local_server", side_effect=fake_server), patch(
-                "evaluate_answercarefully.load_development_data",
+                "evaluate_answercarefully.load_answercarefully_data",
                 return_value=([original_row("one", "area-one"), original_row("two", "area-two")], "revision"),
             ), patch("chat.loaded_model", side_effect=["test/tiny-aya-water", "test/Qwen3Guard-Gen-0.6B"]), patch(
                 "chat.complete", side_effect=responses

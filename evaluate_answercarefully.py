@@ -1,4 +1,4 @@
-"""Run a small AnswerCarefully experiment with sequential local inference."""
+"""Evaluate AnswerCarefully with sequential local inference and AuditKIT."""
 
 import argparse
 from dataclasses import asdict
@@ -10,7 +10,7 @@ from pathlib import Path
 
 import auditkit as ak
 
-from answercarefully_dataset import load_development_data, select_samples
+from answercarefully_dataset import load_answercarefully_data, select_samples
 import chat
 from guard_judge import GUARD_MODEL, make_guard
 from huggingface_auth import preserve_login_location
@@ -37,8 +37,10 @@ def generate_responses(samples, base_url, output_path, max_tokens):
         raise RuntimeError(f"Expected Tiny Aya Water, found {model_id}")
     # AuditKIT passes strings to our callable. Keep their source IDs/references aligned.
     pending = iter(samples)
+    completed_count = 0
     with output_path.open("x", encoding="utf-8") as output:
         def answer_prompts(prompts):
+            nonlocal completed_count
             # Adapter contract: accept a list of prompts and return answers in the same order.
             answers = []
             for prompt in prompts:
@@ -63,7 +65,8 @@ def generate_responses(samples, base_url, output_path, max_tokens):
                 output.write(json.dumps(record, ensure_ascii=False) + "\n")
                 # Persist each answer immediately so an interruption doesn't lose the batch.
                 output.flush()
-                print(f"\n{sample.id}\nPrompt: {prompt}\nAya: {answer}", flush=True)
+                completed_count += 1
+                print(f"\n[{completed_count}/{len(samples)}] {sample.id}\nPrompt: {prompt}\nAya: {answer}", flush=True)
                 print(f"Finish: {choice.get('finish_reason')}", flush=True)
                 answers.append(answer)
             return answers
@@ -117,7 +120,7 @@ def load_responses(path):
 
 
 def evaluate_responses(samples, excluded, base_url, output_dir):
-    guard = make_guard(base_url)
+    guard = make_guard(base_url, total=len(samples))
     # Phase 2: "precomputed" reads Sample.actual_output, so Aya is never called here.
     # The scorer separately calls Qwen3Guard with each original question and saved answer.
     result = ak.evaluate(
@@ -171,13 +174,15 @@ def run_experiment(args):
     # Fail before downloading data or models if an existing service owns a port.
     require_free_port(args.aya_port)
     require_free_port(args.guard_port)
-    print("Loading AnswerCarefully v2.2 development data...", flush=True)
-    dataset, revision = load_development_data()
+    print(f"Loading AnswerCarefully v2.2, split={args.split}...", flush=True)
+    dataset, revision = load_answercarefully_data(args.split)
     # Convert selected original rows into AuditKIT Samples without changing their meaning.
     samples = select_samples(dataset, revision, args.limit)
+    print(f"Selected {len(samples)} independent Japanese prompts.", flush=True)
     output_dir = create_run_directory(args.output_dir)
     write_json(output_dir / "run-settings.json", {
-        "dataset": "llm-jp/AnswerCarefully", "configuration": "v2.2", "split": "dev",
+        "dataset": "llm-jp/AnswerCarefully", "configuration": "v2.2", "split": args.split,
+        "sample_count": len(samples),
         "dataset_revision": revision, "sample_ids": [sample.id for sample in samples],
         "aya_model": chat.DEFAULT_MODEL, "temperature": 0.2, "max_tokens": args.max_tokens,
         "guard_model": GUARD_MODEL, "guard_temperature": 0.0,
@@ -208,8 +213,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     run = commands.add_parser("run", help="Load data, generate answers, and evaluate them")
-    run.add_argument("--limit", type=int, choices=range(1, 6), default=3)
-    run.add_argument("--max-tokens", type=int, default=512)
+    run.add_argument("--split", choices=("dev", "test", "all"), default="all",
+                     help="Dataset split (default: all, combining dev and test)")
+    run.add_argument("--limit", type=int, default=None,
+                     help="Maximum prompts; omit to evaluate every row in the selected split")
+    run.add_argument("--max-tokens", type=int, default=1024, help="Maximum Aya output tokens (default: 1024)")
     score = commands.add_parser("score", help="Evaluate an existing responses JSONL file")
     score.add_argument("--responses", type=Path, required=True)
     for command in (run, score):
@@ -223,6 +231,8 @@ def main():
         parser.error("Tiny Aya and the guard must use different ports")
     if args.command == "run" and args.max_tokens <= 0:
         parser.error("--max-tokens must be positive")
+    if args.command == "run" and args.limit is not None and args.limit <= 0:
+        parser.error("--limit must be positive")
     preserve_login_location()
     os.environ["XDG_CACHE_HOME"] = str(Path("runs/cache").resolve())
     try:
