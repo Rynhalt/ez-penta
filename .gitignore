@@ -7,3 +7,5 @@ __pycache__/
 *.gguf
 *.safetensors
 runs/review-annotations.sqlite3*
+data_ready/answercarefully.sqlite3*
+data_ready/answercarefully_*.sqlite3*
