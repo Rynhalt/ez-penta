@@ -1,0 +1,10 @@
+{
+  "published_variant_rate_rows_checked": 8,
+  "language_comparison_rows_checked": 8,
+  "variant_transition_rows_checked": 8,
+  "pdf_pages": 5,
+  "original_source_files_unchanged": true,
+  "original_data_files_unchanged": true,
+  "tests_passed": 51,
+  "visual_inspection": "All five rendered pages inspected for pagination, legibility and clipping."
+}

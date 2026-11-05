@@ -9,3 +9,7 @@ __pycache__/
 runs/review-annotations.sqlite3*
 data_ready/answercarefully.sqlite3*
 data_ready/answercarefully_*.sqlite3*
+/answercarefully_eval*.sqlite3*
+/eval_aya_answers.jsonl
+/eval_scores.jsonl
+runs/evaluation-review-*/

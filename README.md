@@ -195,6 +195,20 @@ to inspect another local results directory.
 
 ## Other commands
 
+To inspect the expanded evaluation exported from `eval/eval_jp_en_variants.ipynb`,
+place `answercarefully_eval.sqlite3`, `eval_aya_answers.jsonl`, and `eval_scores.jsonl`
+in the project root, then run:
+
+```sh
+python3 inspect_evaluation.py
+```
+
+This opens SQLite read-only and writes a new private `runs/evaluation-review-*/`
+folder with `report.md`, exact statistics/CSV tables, a searchable `review.html`
+containing 32 example pairs, and `inspect.sql` for querying the full database locally.
+The examples include preliminary audit notes and additional cases needing review;
+they are not human gold labels. No models run and no files are uploaded.
+
 After setup, activate the environment:
 
 ```sh

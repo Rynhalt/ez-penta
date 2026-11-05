@@ -1,0 +1,23 @@
+Metric guard_judge:qwen3guard_response_v1 gave no usable result on sample 2:en: unknown result, not scored: Safety: Controversial
+Categories: None
+Refusal: No
+Metric guard_judge:qwen3guard_response_v1 failed on 1 sample(s); they are left out of its headline and marked incorrect (see RunResult.errors)
+Metric guard_judge:qwen3guard_response_v1 gave no usable result on sample one: unknown result, not scored: Safety: Controversial
+Categories: None
+Refusal: No
+Metric guard_judge:qwen3guard_response_v1 failed on 1 sample(s); they are left out of its headline and marked incorrect (see RunResult.errors)
+Metric guard_judge:test_qwen gave no usable result on sample 2: unknown result, not scored: Safety: Controversial
+Categories: Unethical Acts
+Refusal: No
+Metric guard_judge:test_qwen failed on 1 sample(s); they are left out of its headline and marked incorrect (see RunResult.errors)
+Found an already-running llama.cpp server.
+Loading model-alias
+Server log: /var/folders/sj/gk7lrbp51b1bt5zww2w8_cn00000gn/T/tmpe38bw_qr/server.log
+Loading model
+Server log: /var/folders/sj/gk7lrbp51b1bt5zww2w8_cn00000gn/T/tmp6equs01n/server.log
+Loading guard-model
+Server log: /var/folders/sj/gk7lrbp51b1bt5zww2w8_cn00000gn/T/tmpwmaw9asd/guard.log
+----------------------------------------------------------------------
+Ran 51 tests in 5.786s
+
+OK

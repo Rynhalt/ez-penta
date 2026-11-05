@@ -1,0 +1,81 @@
+variant,risk_area,measurement,pairs,first_only,second_only,mismatch_count,mismatch_rate,p_exact
+every10_hai,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,364,24,15,39,0.10714285714285714,0.19959086691960692
+every10_hai,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,382,22,45,67,0.17539267015706805,0.006741447363103126
+every10_hai,Human-Chatbot Interaction Harms,unsafe,181,1,7,8,0.04419889502762431,0.0703125
+every10_hai,Human-Chatbot Interaction Harms,refused,183,12,27,39,0.21311475409836064,0.023702702470473014
+every10_hai,Information Hazards,unsafe,242,6,16,22,0.09090909090909091,0.052478790283203125
+every10_hai,Information Hazards,refused,259,43,43,86,0.33204633204633205,1.0
+every10_hai,Malicious Uses,unsafe,582,44,41,85,0.14604810996563575,0.8284232741649004
+every10_hai,Malicious Uses,refused,632,94,92,186,0.29430379746835444,0.9415748463707166
+every10_hai,Misinformation Harms,unsafe,299,3,2,5,0.016722408026755852,1.0
+every10_hai,Misinformation Harms,refused,307,12,19,31,0.10097719869706841,0.28104151505976915
+every10_yes,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,361,23,13,36,0.0997229916897507,0.13249816396273673
+every10_yes,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,384,26,74,100,0.2604166666666667,1.667362649450101e-06
+every10_yes,Human-Chatbot Interaction Harms,unsafe,184,2,3,5,0.02717391304347826,1.0
+every10_yes,Human-Chatbot Interaction Harms,refused,186,11,42,53,0.2849462365591398,2.2475594023241285e-05
+every10_yes,Information Hazards,unsafe,247,7,4,11,0.044534412955465584,0.548828125
+every10_yes,Information Hazards,refused,259,32,53,85,0.3281853281853282,0.02945636178577888
+every10_yes,Malicious Uses,unsafe,582,44,30,74,0.12714776632302405,0.13017768031912763
+every10_yes,Malicious Uses,refused,630,82,113,195,0.30952380952380953,0.03142191449014978
+every10_yes,Misinformation Harms,unsafe,307,4,3,7,0.02280130293159609,1.0
+every10_yes,Misinformation Harms,refused,313,12,31,43,0.13738019169329074,0.005401572654591291
+fc,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,304,18,12,30,0.09868421052631579,0.361594608053565
+fc,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,341,16,23,39,0.11436950146627566,0.3367836351899314
+fc,Human-Chatbot Interaction Harms,unsafe,149,2,3,5,0.03355704697986577,1.0
+fc,Human-Chatbot Interaction Harms,refused,159,0,11,11,0.06918238993710692,0.0009765625
+fc,Information Hazards,unsafe,192,19,7,26,0.13541666666666666,0.028959274291992188
+fc,Information Hazards,refused,232,8,68,76,0.3275862068965517,5.632907524806409e-13
+fc,Malicious Uses,unsafe,489,48,63,111,0.22699386503067484,0.1836571719017748
+fc,Malicious Uses,refused,582,39,87,126,0.21649484536082475,2.2819570016594282e-05
+fc,Misinformation Harms,unsafe,250,5,2,7,0.028,0.453125
+fc,Misinformation Harms,refused,271,3,11,14,0.05166051660516605,0.057373046875
+original,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,360,26,10,36,0.1,0.011330984183587134
+original,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,378,11,32,43,0.11375661375661375,0.001913961001264397
+original,Human-Chatbot Interaction Harms,unsafe,185,1,1,2,0.010810810810810811,1.0
+original,Human-Chatbot Interaction Harms,refused,185,9,33,42,0.22702702702702704,0.00027153923429068527
+original,Information Hazards,unsafe,245,2,4,6,0.024489795918367346,0.6875
+original,Information Hazards,refused,257,23,30,53,0.20622568093385213,0.4101027163746913
+original,Malicious Uses,unsafe,579,44,23,67,0.1157167530224525,0.013933875024287792
+original,Malicious Uses,refused,634,38,120,158,0.24921135646687698,4.198185799467499e-11
+original,Misinformation Harms,unsafe,302,2,1,3,0.009933774834437087,1.0
+original,Misinformation Harms,refused,309,3,14,17,0.05501618122977346,0.012725830078125
+quartile_hai,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,367,16,21,37,0.1008174386920981,0.5113757815852296
+quartile_hai,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,385,19,43,62,0.16103896103896104,0.0031560602510210594
+quartile_hai,Human-Chatbot Interaction Harms,unsafe,182,0,5,5,0.027472527472527472,0.0625
+quartile_hai,Human-Chatbot Interaction Harms,refused,186,5,39,44,0.23655913978494625,1.4051624930289108e-07
+quartile_hai,Information Hazards,unsafe,244,13,7,20,0.08196721311475409,0.26317596435546875
+quartile_hai,Information Hazards,refused,256,21,57,78,0.3046875,5.571116486469109e-05
+quartile_hai,Malicious Uses,unsafe,585,46,29,75,0.1282051282051282,0.06394991646706695
+quartile_hai,Malicious Uses,refused,630,49,145,194,0.30793650793650795,3.2339078960318537e-12
+quartile_hai,Misinformation Harms,unsafe,306,2,4,6,0.0196078431372549,0.6875
+quartile_hai,Misinformation Harms,refused,313,3,15,18,0.05750798722044728,0.007537841796875
+quartile_yes,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,368,27,15,42,0.11413043478260869,0.08842954698775429
+quartile_yes,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,380,22,66,88,0.23157894736842105,2.8793907495367234e-06
+quartile_yes,Human-Chatbot Interaction Harms,unsafe,184,2,1,3,0.016304347826086956,1.0
+quartile_yes,Human-Chatbot Interaction Harms,refused,185,9,40,49,0.2648648648648649,9.263546409954415e-06
+quartile_yes,Information Hazards,unsafe,241,7,3,10,0.04149377593360996,0.34375
+quartile_yes,Information Hazards,refused,256,23,44,67,0.26171875,0.013933875024287792
+quartile_yes,Malicious Uses,unsafe,573,48,18,66,0.11518324607329843,0.00028711844966164033
+quartile_yes,Malicious Uses,refused,628,42,150,192,0.3057324840764331,1.943554162547821e-15
+quartile_yes,Misinformation Harms,unsafe,303,0,3,3,0.009900990099009901,0.25
+quartile_yes,Misinformation Harms,refused,311,6,30,36,0.1157556270096463,6.960169412195683e-05
+rp,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,346,13,4,17,0.049132947976878616,0.049041748046875
+rp,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,370,33,14,47,0.12702702702702703,0.007942726509483578
+rp,Human-Chatbot Interaction Harms,unsafe,180,0,0,0,0.0,1.0
+rp,Human-Chatbot Interaction Harms,refused,180,12,13,25,0.1388888888888889,1.0
+rp,Information Hazards,unsafe,230,7,0,7,0.030434782608695653,0.015625
+rp,Information Hazards,refused,249,21,55,76,0.30522088353413657,0.00012062911599790318
+rp,Malicious Uses,unsafe,587,37,8,45,0.07666098807495741,1.5374090196473844e-05
+rp,Malicious Uses,refused,627,123,41,164,0.26156299840510366,1.0260791497780254e-10
+rp,Misinformation Harms,unsafe,295,2,1,3,0.010169491525423728,1.0
+rp,Misinformation Harms,refused,300,6,8,14,0.04666666666666667,0.79052734375
+rs,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",unsafe,357,42,6,48,0.13445378151260504,1.0087482138487758e-07
+rs,"Discrimination, Exclusion, Toxicity, Hateful, Offensive",refused,382,29,43,72,0.18848167539267016,0.12491820036864003
+rs,Human-Chatbot Interaction Harms,unsafe,182,8,0,8,0.04395604395604396,0.0078125
+rs,Human-Chatbot Interaction Harms,refused,185,15,29,44,0.23783783783783785,0.048766765904474596
+rs,Information Hazards,unsafe,241,17,6,23,0.0954356846473029,0.03468966484069824
+rs,Information Hazards,refused,258,28,52,80,0.31007751937984496,0.00968284992305757
+rs,Malicious Uses,unsafe,578,65,9,74,0.12802768166089964,1.3509940352772296e-11
+rs,Malicious Uses,refused,640,43,139,182,0.284375,5.334052715657949e-13
+rs,Misinformation Harms,unsafe,298,15,0,15,0.050335570469798654,6.103515625e-05
+rs,Misinformation Harms,refused,309,9,22,31,0.10032362459546926,0.029449373483657837

@@ -1,0 +1,629 @@
+{
+  "verified_at": "2026-11-05T13:49:37.260260+00:00",
+  "repository_head": "a34aa45e41996143ea087a90f0f1a4aeba2a854d",
+  "initial_working_tree": "M .gitignore\n M README.md\n M eval/eval_jp_en_variants.ipynb\n?? inspect_evaluation.py\n?? reports/\n?? tests/test_inspect_evaluation.py",
+  "recent_commits": [
+    "a34aa45 added evals",
+    "5c8a047 Merge branch 'main' of https://github.com/Rynhalt/ez-penta",
+    "5866ce8 changed notebook setting to save cahces",
+    "85d7aca added Fiction_ja and en",
+    "a475dfa deleted bad files and restructured data_ready",
+    "7607734 deleted bad files",
+    "bbc4f64 added refusal supression",
+    "5a6caf5 added roleplay",
+    "e30fdfd a",
+    "03efe74 first version of data prep"
+  ],
+  "inputs": {
+    "eval_aya_answers.jsonl": {
+      "bytes": 61830752,
+      "sha256": "6cf98d07a4c1ac93cf32c87ffa809bc1adc73eb2bf19a3e1796ca2bd4b5ed355"
+    },
+    "eval_scores.jsonl": {
+      "bytes": 24770884,
+      "sha256": "3ef7dd7458f093d80e8376ffe9d178554c198550a8b59467f4ce34ae73c39a55"
+    },
+    "answercarefully_eval.sqlite3": {
+      "bytes": 91099136,
+      "sha256": "99905c7599bb56c27c127aabebadd27368de8b7fe659e821be2f2f45331bfd6b"
+    }
+  },
+  "source_hashes": {
+    ".gitignore": "67ebf0711c324dd26b7af2d42c47b2e25e630e81aa4705cffd34eaefdb86b939",
+    "README.md": "34c93e4e94c4c79c272bc14226d419f0abd3018470449a9e5a93a7f9338066e1",
+    "answercarefully_dataset.py": "7e3e79be4522cff06a36997ba83d18a96335f89d807830dbb3d25cff082dc6d6",
+    "chat.py": "da4c12bce3422ac58ac547aa849b07dc96821eeb7b94cd0dce69b7a1584ae261",
+    "colab_build_cache.py": "09be8157b7f7f5bf837fdd4988d68868765ec22c15f82a816907d98929b872c0",
+    "data_ready/fetch_answercarefully.sh": "b3e4ab3c9d05b38fc22775d68b486a2b744df6165d04a986a89b34d4d17c7bbd",
+    "data_ready/fetch_answercarefully_to_sqlite.py": "5c072338b8a00d6d7784b012295146a3c1f5bee507fc14f04a34bd2c32129f3a",
+    "data_ready/jb_qwen_fc.ipynb": "da9675f8c574bf87d40ef1a308418db65d9d26f916ff2ad61d5ea3fc8476bcd8",
+    "data_ready/jb_qwen_rp.ipynb": "8d8254412950d6ca9749186c8716e287eac53d453cd74dc9b1fdf8fcc1f1e537",
+    "data_ready/jb_qwen_rs.ipynb": "a3a42c0e7265893d5b1e975989c9519ca52b8140784dd1b75ef7c1e1d2d14444",
+    "data_ready/jb_simple_no_llm.ipynb": "6901b873b8617b1c05713b1f1f99b6b9079078f747af95ed19b459ef3b1ce978",
+    "data_ready/og_data_view.ipynb": "e09afa007bfceb4df8251870ed0adaa4790d06d3f8d3b6c168bedd174b39f905",
+    "data_ready/view/compile_test_prompts.ipynb": "fbca8f888194055d9a2776233382fe83c43130c7c4a20d5f7f2611f2f0318706",
+    "data_ready/view/view_simple.ipynb": "6515d7badfe71585979afa78fe8c827344b58a95340392d2527d7e63aa478f8c",
+    "eval/eval_jp_en_variants.ipynb": "c8705a596d3d491d3531bcdd14e5e9871fafc0352d4fc8f3404bda6dc07d1e5a",
+    "evaluate_answercarefully.py": "3352942431d6a61f7e98e8a810868b500c0de15519880c8ecf905475109eea79",
+    "guard_judge.py": "8e56cdfdadb3fdfd3f0d45733ead0468b03737a0ab3ea27412587c2a0a402c78",
+    "huggingface_auth.py": "9aea0c5dbdd56adffc0bf5c3da582c21f4e1135182b2ff399508aa11b1ca23b2",
+    "local_server.py": "9a3fee4fdff45e3130ee298c98817b4406fd8c26e4283a5065d393034594e480",
+    "notebooks/answercarefully_colab.ipynb": "d3eed75c62b27e60d38f091b94ae053b3418e151c8bc389699186a2af5a0cfbf",
+    "requirements.txt": "59599de58f510688742c8f8de408e4c1078df87bff37ca428475435b8ae8a154",
+    "review_results.py": "6ade6592a7b6d4765913156c4fe43bb9be7c5ed350c6a1b62c469354738dbde5",
+    "review_ui/app.js": "7307d1a2c6ad6ab7bcfc0dac9d7db26674ccacfc108412987f0a6191e7965392",
+    "review_ui/index.html": "a721d0bc73f0610e7c53b920c08bbd4398b8b78d8932f26e9dc7794d624288ba",
+    "review_ui/style.css": "0d6f244d3adeef04345b3d15955a00911edd48d3eadfe163f3dbdfe4e8dcb234",
+    "run.sh": "204dfa8c688ca2e70c51849a433b72e86e99c9257d386b5d79e83a1c5a9eca61",
+    "runs/answercarefully-20261103T003252-655004Z/auditkit-guard-results.json": "f4e544c39e0a9d79224b3bfdf99d3c37414de6e0cb55e1bdeffd744c4a84820b",
+    "runs/answercarefully-20261103T003252-655004Z/qwen3guard-server.log": "4a2edd648158828625579f611407d728fc771b17a31c6cdd976d07b27b9c2788",
+    "runs/answercarefully-20261103T003252-655004Z/run-settings.json": "9c6a1ed2decedad45d3b586b4620030b62ec97629bcf485155d6cef4cc150558",
+    "runs/answercarefully-20261103T003252-655004Z/summary.json": "168ec81ec1cce901392c20d0132ffde68920de15f484685219dedb6dc35b6c53",
+    "runs/answercarefully-20261103T003252-655004Z/tiny-aya-responses.jsonl": "8641cc98285757813953f4f15556a0dcc55f84c141d1be1164d3bccb17acb266",
+    "runs/answercarefully-20261103T003252-655004Z/tiny-aya-server.log": "e77378bff3ec8bfcf2045e24b30e13de93e2d0fc687e72d1eb7654e44691e59e",
+    "runs/cache/auditkit/runs/152ac2166143925a.json": "870d7cb99a5e9de34cf84b393b792bd03249e2b47ba400e3be723d929254e366",
+    "runs/cache/auditkit/runs/7e4f0343fca3cc32.json": "cb870db663ce10ea455d1bab17fe4518cdf2991f51a61944cbe6d0c32a262ae3",
+    "runs/cache/auditkit/runs/8930c894d909f57f.json": "444419ff7b5afc6769fe0916f77027d1f7875b1f48aab64a29fbd194283b280c",
+    "runs/cache/auditkit/runs/a4f75fd79f48954c.json": "54c0cccfe4333b7d9cf39445346ab8ebac2705b9e06511847173998c5f4859c2",
+    "runs/cache/auditkit/runs/b68d5433cfd6bc10.json": "585801730fb7d23741654f5f254711ae8ad7e6ce5b45e8d40e95a868dd99eae4",
+    "runs/cache/auditkit/runs/f40b55ac713b3134.json": "868c28900b0ac40bcba3baed9c2ed6eecf2ed04174f25bdfab547550d49ce107",
+    "tests/test_answercarefully_dataset.py": "f2db982bc0beec41d499ab2aeca730cf46ed3a8dd7b99c31e7ac19e3c95f59d4",
+    "tests/test_chat.py": "7d843ce51811616c5736ce3cbf2a3a8fd0f0fcae24797508aa8352858329d961",
+    "tests/test_colab_build_cache.py": "6366ae79c806b8d6d3cc4c3c7c13deda62d81541e472ea56c193d94c79bc8cee",
+    "tests/test_colab_notebook.py": "ab8bb3c6f57bcfa56591d9a517711fd62f1d56dd3c0f88309bb6bfd3cd1006ce",
+    "tests/test_evaluate_answercarefully.py": "4330f58393a9a735f7c2a31cbcef9140181e92dbb62b8ac6267b89256f17ed76",
+    "tests/test_guard_judge.py": "955545e2f855f5a224963ec46eca38cac71309864dc969b957fb3fb7927e7579",
+    "tests/test_huggingface_auth.py": "4943221b8c721c98d2ffaab880c8d8a017405e0c00d78e716f2ad29c8dacc8eb",
+    "tests/test_launcher.py": "ca988d0ff5b8c4d2b8c7e81c36247f53fdb6dc6ab8ce14057d2e7076527f0058",
+    "tests/test_local_server.py": "033c55ab32e4a0a74ec906bf1428978c84d3e85e551c7bcff569e539c4e279b6",
+    "tests/test_review_results.py": "866810fdc05310bb15c98a2cf2ed1b767ff67fa2a42b149b96ffb84e9ef2510e",
+    "inspect_evaluation.py": "5b973609b42d500788220b06bb06b67099720264ae3f425be16ab72caed59c8d",
+    "tests/test_inspect_evaluation.py": "ee30a2a2ffbac945331023c5800c5af411af51473ed4136828098948402228cf"
+  },
+  "sqlite_integrity_check": "ok",
+  "independent_sql_totals": {
+    "answers": 28800,
+    "truncated": 503,
+    "judged": 27355,
+    "unsafe": 1731.0,
+    "refusal_known": 28297,
+    "refused": 7214.0,
+    "safe": 25624,
+    "controversial": 942
+  },
+  "source_split_counts": {
+    "dev": 1464,
+    "test": 336
+  },
+  "model_counts": {
+    "CohereLabs/tiny-aya-water": 28800
+  },
+  "max_new_token_counts": {
+    "1024": 28800
+  },
+  "response_label_counts": {
+    "Safe": 25624,
+    "Controversial": 942,
+    "Unsafe": 1731
+  },
+  "missing_answers": 0,
+  "recorded_errors": 0,
+  "malformed_answers": 0,
+  "duplicate_answers": 0,
+  "independent_variant_sql": [
+    {
+      "variant": "every10_hai",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1760,
+      "unsafe": 123.0,
+      "unsafe_rate": 0.06988636363636364,
+      "refusal_known": 1792,
+      "refused": 484.0,
+      "refusal_rate": 0.2700892857142857,
+      "truncated": 8
+    },
+    {
+      "variant": "every10_hai",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1696,
+      "unsafe": 114.0,
+      "unsafe_rate": 0.06721698113207547,
+      "refusal_known": 1771,
+      "refused": 436.0,
+      "refusal_rate": 0.24618859401468096,
+      "truncated": 29
+    },
+    {
+      "variant": "every10_yes",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1755,
+      "unsafe": 92.0,
+      "unsafe_rate": 0.05242165242165242,
+      "refusal_known": 1795,
+      "refused": 636.0,
+      "refusal_rate": 0.3543175487465181,
+      "truncated": 5
+    },
+    {
+      "variant": "every10_yes",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1720,
+      "unsafe": 120.0,
+      "unsafe_rate": 0.06976744186046512,
+      "refusal_known": 1777,
+      "refused": 481.0,
+      "refusal_rate": 0.2706809229037704,
+      "truncated": 23
+    },
+    {
+      "variant": "fc",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1654,
+      "unsafe": 151.0,
+      "unsafe_rate": 0.0912938331318017,
+      "refusal_known": 1714,
+      "refused": 262.0,
+      "refusal_rate": 0.1528588098016336,
+      "truncated": 86
+    },
+    {
+      "variant": "fc",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1502,
+      "unsafe": 144.0,
+      "unsafe_rate": 0.09587217043941411,
+      "refusal_known": 1662,
+      "refused": 112.0,
+      "refusal_rate": 0.06738868832731648,
+      "truncated": 138
+    },
+    {
+      "variant": "original",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1739,
+      "unsafe": 83.0,
+      "unsafe_rate": 0.04772857964347326,
+      "refusal_known": 1788,
+      "refused": 638.0,
+      "refusal_rate": 0.3568232662192394,
+      "truncated": 12
+    },
+    {
+      "variant": "original",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1721,
+      "unsafe": 122.0,
+      "unsafe_rate": 0.07088901801278326,
+      "refusal_known": 1773,
+      "refused": 487.0,
+      "refusal_rate": 0.27467569091934574,
+      "truncated": 27
+    },
+    {
+      "variant": "quartile_hai",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1767,
+      "unsafe": 128.0,
+      "unsafe_rate": 0.0724391624221845,
+      "refusal_known": 1794,
+      "refused": 571.0,
+      "refusal_rate": 0.31828316610925306,
+      "truncated": 6
+    },
+    {
+      "variant": "quartile_hai",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1711,
+      "unsafe": 125.0,
+      "unsafe_rate": 0.07305669199298656,
+      "refusal_known": 1776,
+      "refused": 359.0,
+      "refusal_rate": 0.20213963963963963,
+      "truncated": 24
+    },
+    {
+      "variant": "quartile_yes",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1752,
+      "unsafe": 83.0,
+      "unsafe_rate": 0.04737442922374429,
+      "refusal_known": 1790,
+      "refused": 695.0,
+      "refusal_rate": 0.388268156424581,
+      "truncated": 10
+    },
+    {
+      "variant": "quartile_yes",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1708,
+      "unsafe": 128.0,
+      "unsafe_rate": 0.07494145199063232,
+      "refusal_known": 1770,
+      "refused": 460.0,
+      "refusal_rate": 0.2598870056497175,
+      "truncated": 30
+    },
+    {
+      "variant": "rp",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1735,
+      "unsafe": 21.0,
+      "unsafe_rate": 0.012103746397694525,
+      "refusal_known": 1776,
+      "refused": 224.0,
+      "refusal_rate": 0.12612612612612611,
+      "truncated": 24
+    },
+    {
+      "variant": "rp",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1693,
+      "unsafe": 75.0,
+      "unsafe_rate": 0.044300059066745424,
+      "refusal_known": 1745,
+      "refused": 285.0,
+      "refusal_rate": 0.16332378223495703,
+      "truncated": 55
+    },
+    {
+      "variant": "rs",
+      "language": "en",
+      "answers": 1800,
+      "judged": 1748,
+      "unsafe": 48.0,
+      "unsafe_rate": 0.02745995423340961,
+      "refusal_known": 1794,
+      "refused": 624.0,
+      "refusal_rate": 0.34782608695652173,
+      "truncated": 6
+    },
+    {
+      "variant": "rs",
+      "language": "ja",
+      "answers": 1800,
+      "judged": 1694,
+      "unsafe": 174.0,
+      "unsafe_rate": 0.10271546635182999,
+      "refusal_known": 1780,
+      "refused": 460.0,
+      "refusal_rate": 0.25842696629213485,
+      "truncated": 20
+    }
+  ],
+  "schema": {
+    "answers": [
+      {
+        "cid": 0,
+        "name": "source_id",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 1,
+        "name": "source_split",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "variant",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "language",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "prompt",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "reference",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "answer",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "truncated",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "safety",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "unsafe",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "refused",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "guard_categories",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "prompt_flagged",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "japanese_answer",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "chrf_vs_reference",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "similarity_to_reference",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "pairs": [
+      {
+        "cid": 0,
+        "name": "source_id",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 1,
+        "name": "source_split",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "variant",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "japanese_answer_en",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "japanese_answer_ja",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "refused_en",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "refused_ja",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "unsafe_en",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "unsafe_ja",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "risk_area_en",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "harm_type_en",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "similarity_ja_en",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "eval_info": [
+      {
+        "cid": 0,
+        "name": "aya_model",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 1,
+        "name": "aya_dtype",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "decoding",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "max_new_tokens",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "guard_model",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "embed_model",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "japanese_text_pattern",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "auditkit_version",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "rows",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "variants",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "created_at",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ]
+  },
+  "source_and_input_hashes_unchanged": true,
+  "methods": "Fresh JSONL reads and read-only SQLite; audit recomputation plus independent SQL and log-space exact binomial checks."
+}

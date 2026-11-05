@@ -1,0 +1,32 @@
+{
+  "pages": [
+    {
+      "page": 1,
+      "text_characters": 4198,
+      "outside_page_bounds": []
+    },
+    {
+      "page": 2,
+      "text_characters": 3341,
+      "outside_page_bounds": []
+    },
+    {
+      "page": 3,
+      "text_characters": 3202,
+      "outside_page_bounds": []
+    },
+    {
+      "page": 4,
+      "text_characters": 4061,
+      "outside_page_bounds": []
+    },
+    {
+      "page": 5,
+      "text_characters": 4885,
+      "outside_page_bounds": []
+    }
+  ],
+  "page_count": 5,
+  "reportlab_version": "5.1.0",
+  "pymupdf_version": "2.1"
+}
