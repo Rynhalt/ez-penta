@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dataset2 human review</title>
+<style>
+body{font:16px system-ui,sans-serif;margin:0;background:#f2f4f7;color:#172033}
+main{max-width:1200px;margin:auto;padding:24px}
+h1,h2,h3{margin:.6em 0}
+nav,.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-block:12px}
+button,input,select,textarea{font:inherit;padding:7px;max-width:100%}
+button{cursor:pointer}
+.panels,#fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+section,#fields{background:white;border:1px solid #cbd4df;border-radius:8px;padding:15px;margin-block:10px}
+pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0 12px}
+label{display:flex;flex-direction:column;gap:4px}
+textarea{min-height:55px}
+#notice{min-height:1.5em}
+@media(max-width:680px){.panels,#fields{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>Dataset2 human review</h1>
+<p>Read both full prompts and responses. Use one reviewer ID per file and export your own judgments before comparing with another reviewer.</p>
+<nav aria-label="Review navigation">
+<label>Cohort <select id="cohort"></select></label>
+<label>Example <select id="item"></select></label>
+<button id="previous" type="button">Previous</button>
+<button id="next" type="button">Next</button>
+</nav>
+<p id="metadata"></p>
+<div class="panels" id="panels"></div>
+<h2>Judgments</h2>
+<div class="controls">
+<label>Reviewer ID <input id="reviewer" autocomplete="off"></label>
+<label>Import saved judgments <input id="import" type="file" accept=".jsonl"></label>
+<button id="export" type="button">Export judgments</button>
+</div>
+<div id="fields"></div>
+<p id="notice" role="status"></p>
+</main>
+<script type="application/json" id="data">REVIEW_PAYLOAD</script>
+<script>
+"use strict";
+const data = JSON.parse(document.getElementById("data").textContent);
+const byId = (id) => document.getElementById(id);
+const cohort = byId("cohort");
+const item = byId("item");
+const reviewer = byId("reviewer");
+const entries = new Map();
+const lookup = new Map();
+const friendly = (text) => text.replaceAll("_", " ");
+for (const [index, group] of data.groups.entries()) {
+  cohort.add(new Option(group.name, index));
+  for (const row of group.rows) lookup.set(row.row_id, group.fields);
+}
+function current() {
+  const group = data.groups[Number(cohort.value)];
+  return [group, group.rows[Number(item.value)]];
+}
+function show() {
+  const [group, row] = current();
+  byId("previous").disabled = Number(item.value) <= 0;
+  byId("next").disabled = Number(item.value) >= group.rows.length - 1;
+  byId("metadata").textContent = [row.row_id, row.split, row.category, row.culture].join(" · ");
+  const panels = byId("panels");
+  panels.replaceChildren();
+  for (const side of group.sides) {
+    const panel = document.createElement("section");
+    const heading = document.createElement("h2");
+    heading.textContent = {ja: "Japanese", en: "English", control: "Control", rp: "Roleplay"}[side];
+    panel.append(heading);
+    for (const [key, title] of [["prompt", "Prompt"], ["request", "Request"], ["answer", "Response"]]) {
+      const label = document.createElement("h3");
+      label.textContent = title;
+      const value = document.createElement("pre");
+      value.textContent = row[key + "_" + side] ?? "";
+      value.lang = ["ja", "en"].includes(side) ? side : row.language;
+      panel.append(label, value);
+    }
+    panels.append(panel);
+  }
+  const fields = byId("fields");
+  fields.replaceChildren();
+  for (const [field, choices] of Object.entries(group.fields)) {
+    const label = document.createElement("label");
+    label.textContent = friendly(field);
+    const input = document.createElement(choices ? "select" : "textarea");
+    if (choices) {
+      input.add(new Option("Select", ""));
+      for (const choice of choices.split(" ")) input.add(new Option(friendly(choice), choice));
+    }
+    input.value = entries.get(row.row_id)?.[field] ?? "";
+    input.addEventListener("input", () => {
+      const record = entries.get(row.row_id) ?? {};
+      record[field] = input.value;
+      entries.set(row.row_id, record);
+    });
+    label.append(input);
+    fields.append(label);
+  }
+}
+function changeCohort() {
+  item.replaceChildren();
+  const group = data.groups[Number(cohort.value)];
+  for (const [index, row] of group.rows.entries()) {
+    item.add(new Option(`${index + 1} / ${group.rows.length} · ${row.category}`, index));
+  }
+  show();
+}
+cohort.addEventListener("change", changeCohort);
+item.addEventListener("change", show);
+for (const [id, offset] of [["previous", -1], ["next", 1]]) {
+  byId(id).addEventListener("click", () => { item.selectedIndex += offset; show(); });
+}
+byId("export").addEventListener("click", () => {
+  if (!reviewer.value.trim()) {
+    byId("notice").textContent = "Enter a reviewer ID before exporting.";
+    return;
+  }
+  const records = [];
+  for (const [row_id, fields] of entries) {
+    if (!Object.values(fields).some((v) => v.trim())) continue;
+    records.push(JSON.stringify({
+      ...fields, row_id, annotator_id: reviewer.value.trim(),
+      reviewer_type: "human", review_status: "needs_review", review_version: data.version
+    }));
+  }
+  if (!records.length) {
+    byId("notice").textContent = "Enter at least one judgment.";
+    return;
+  }
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([records.join("\n") + "\n"], {type: "application/x-ndjson"}));
+  link.download = "dataset2-human-review.jsonl";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  byId("notice").textContent = `Exported ${records.length} examples.`;
+});
+byId("import").addEventListener("change", async (event) => {
+  if (!event.target.files.length) return;
+  try {
+    const lines = (await event.target.files[0].text()).split(/\r?\n/).filter((line) => line.trim());
+    const imported = new Map();
+    const identities = new Set();
+    for (const line of lines) {
+      const record = JSON.parse(line);
+      const fields = lookup.get(record.row_id);
+      if (!fields || imported.has(record.row_id) || record.review_version !== data.version ||
+          record.reviewer_type !== "human" || typeof record.annotator_id !== "string" ||
+          !record.annotator_id.trim()) throw new Error("Invalid row ID, reviewer, or review version.");
+      const selected = {};
+      for (const [field, choices] of Object.entries(fields)) {
+        const value = record[field] ?? "";
+        if (typeof value !== "string" || (value && choices && !choices.split(" ").includes(value))) {
+          throw new Error("Invalid judgment.");
+        }
+        selected[field] = value;
+      }
+      imported.set(record.row_id, selected);
+      identities.add(record.annotator_id);
+    }
+    if (identities.size !== 1 || (reviewer.value.trim() && !identities.has(reviewer.value.trim()))) {
+      throw new Error("Open a separate copy for each reviewer.");
+    }
+    reviewer.value = [...identities][0];
+    for (const [id, fields] of imported) entries.set(id, fields);
+    byId("notice").textContent = `Imported ${imported.size} examples.`;
+    show();
+  } catch (error) {
+    byId("notice").textContent = error.message;
+  } finally {
+    event.target.value = "";
+  }
+});
+changeCohort();
+</script>
+</body>
+</html>
