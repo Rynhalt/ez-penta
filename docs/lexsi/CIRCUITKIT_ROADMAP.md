@@ -109,10 +109,10 @@ Current CircuitKIT references (read them before implementing):
 - [x] Distinguish published, recovered, unknown and human judgment fields; never overwrite raw source labels.
 - [x] Produce an auditable **401-pair** review matrix with evidence and explicit per-row review state; no fake annotations.
 - [x] Produce a review/calibration matrix for 80 agreement pairs (with selection caveat).
-- [ ] Inspect and rank 87 same-language control/roleplay candidate contrasts; only export **human-approved** records as gold.
+- [x] Inspect and rank 87 same-language control/roleplay candidate contrasts; only export **human-approved** records as gold.
 - [x] Exclude heldout from selection/tuning, record its prior exposure, enforce unique seed IDs at final contrast export.
 - [x] Provide a CPU-only script and tests for the saved shards.
-- [ ] Commit `docs/lexsi/CIRCUITKIT_ROADMAP.md` plus concise agent instructions linking it for future Codex sessions.
+- [x] Commit `docs/lexsi/CIRCUITKIT_ROADMAP.md` plus concise agent instructions linking it for future Codex sessions.
 - [ ] Provide final summary: counts by review outcome, reviewed/unreviewed counts, human approvals vs provisional, top causes of guard discrepancies, chosen contrast counts by language/category, unresolved blockers, exact commands to reproduce.
 
 **Stop condition:** Finish review tooling, provisional audit where possible, shortlist and human sign-off workflow. Do not claim CircuitKIT ran or that its circuit works until those stages are actually executed.
