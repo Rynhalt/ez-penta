@@ -288,14 +288,17 @@ baseline. Nothing in it depends on the post_train_2 changes.
 | File | What it is |
 |---|---|
 | `notebooks/pipeline{1..5}_*.ipynb` | The notebooks, with outputs from this run |
-| `notebooks/pipeline4_circuit_restricted_fix_FAILED.ipynb` | The earlier out-of-memory T4 attempt, kept for reference; safe to delete |
 | `notebooks/build_sampling_pools.py`, `build_pipeline2_prompts.py` | Deterministic builders for every prompt set (seed 42) |
 | `notebooks/pipeline2_prompts_v2.json`, `pipeline3_*seed_prompts_v2.json`, `pipeline5_validation_prompts_v2.json` | The built prompt sets |
 | `notebooks/combined/pipeline2_results.json` | Layer selection, bootstrap frequencies, projection tests |
 | `notebooks/combined/pipeline3_safety_pairs_v2.jsonl` | 195 training pairs (`type` = refusal or helpful) |
 | `notebooks/combined/pipeline3_guard_dropped_v2.jsonl` | 37 pairs the guard rejected |
-| `notebooks/combined/pipeline4_results.json`, `pipeline4_adapters.zip` | Training summary; both LoRA adapters (113 MB, not for plain git) |
+| `notebooks/combined/pipeline4_results.json` | Training summary |
+| `notebooks/combined/pipeline4_adapters.zip` | Both LoRA adapters. **Local only:** 113 MB, over GitHub's 100 MB limit, so it is gitignored. Share it separately (Drive, Hugging Face) if teammates need it. |
 | `notebooks/combined/pipeline5_results.json`, `pipeline5_answers.jsonl` | All statistics; every answer and guard verdict |
+
+The build scripts also read `notebooks/combined/observations.csv` at the repo root (412 MB).
+That file is gitignored too, so anyone rerunning the prompt builders needs a copy of it.
 
 To rebuild a fixed model: load `CohereLabs/tiny-aya-water` in bf16, apply the adapter from the
 zip with `peft.PeftModel.from_pretrained`, then call `merge_and_unload()`.

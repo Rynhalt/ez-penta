@@ -14,3 +14,22 @@ data_ready/answercarefully_*.sqlite3*
 /eval_scores.jsonl
 runs/evaluation-review-*/
 /evaluations/
+
+# Large dataset2 eval outputs (each > GitHub's 100MB file limit); regenerate with the eval
+# notebooks + notebooks/dataset2_2part_output_combiner.ipynb, or share them outside git.
+notebooks/combined/scores_current.jsonl
+notebooks/combined/results.sqlite3
+notebooks/combined/observations.csv
+notebooks/combined/manual_inspection.csv
+notebooks/combined/answers_current.jsonl
+
+# Trained LoRA adapters and model checkpoints (large binaries)
+post_train_*/notebooks/combined/*.zip
+post_train_*/notebooks/combined/*_adapter/
+*.bin
+*.pt
+
+# Failed-run notebook copies and local server/run logs
+*_FAILED.ipynb
+runs/*.log
+runs/answercarefully-*/*.log
