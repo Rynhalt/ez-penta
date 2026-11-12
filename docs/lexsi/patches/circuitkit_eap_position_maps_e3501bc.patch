@@ -1,0 +1,396 @@
+diff --git a/src/circuitkit/backends/eap/attribute.py b/src/circuitkit/backends/eap/attribute.py
+index 1a98105..f2c5dbc 100644
+--- a/src/circuitkit/backends/eap/attribute.py
++++ b/src/circuitkit/backends/eap/attribute.py
+@@ -8,6 +8,7 @@ from tqdm import tqdm
+ from transformer_lens import HookedTransformer
+ 
+ from .eap_utils import (
++    _build_eap_ig_input_endpoints,
+     compute_mean_activations,
+     grads_through_embeddings_only,
+     make_hooks_and_matrices,
+@@ -146,7 +147,14 @@ def get_scores_eap(
+     pair_padding_side = getattr(dataloader, "pair_padding_side", None)
+     templated = getattr(dataloader, "templated", False)
+     dataloader = dataloader if quiet else tqdm(dataloader)
+-    for clean, corrupted, label in dataloader:
++    for batch in dataloader:
++        if len(batch) == 3:
++            clean, corrupted, label = batch
++            position_maps = None
++        elif len(batch) == 4:
++            clean, corrupted, label, position_maps = batch
++        else:
++            raise ValueError("EAP batches must be (clean, corrupted, label[, position_maps])")
+         batch_size = len(clean)
+         total_items += batch_size
+         (
+@@ -161,7 +169,9 @@ def get_scores_eap(
+         )
+ 
+         (fwd_hooks_corrupted, fwd_hooks_clean, bwd_hooks), activation_difference = (
+-            make_hooks_and_matrices(model, graph, batch_size, n_pos, scores)
++            make_hooks_and_matrices(
++                model, graph, batch_size, n_pos, scores, position_maps=position_maps
++            )
+         )
+ 
+         with torch.inference_mode():
+@@ -228,7 +238,14 @@ def get_scores_eap_ig(
+     pair_padding_side = getattr(dataloader, "pair_padding_side", None)
+     templated = getattr(dataloader, "templated", False)
+     dataloader = dataloader if quiet else tqdm(dataloader)
+-    for clean, corrupted, label in dataloader:
++    for batch in dataloader:
++        if len(batch) == 3:
++            clean, corrupted, label = batch
++            position_maps = None
++        elif len(batch) == 4:
++            clean, corrupted, label, position_maps = batch
++        else:
++            raise ValueError("EAP-IG batches must be (clean, corrupted, label[, position_maps])")
+         batch_size = len(clean)
+         total_items += batch_size
+         (
+@@ -246,8 +263,17 @@ def get_scores_eap_ig(
+         # The forward corrupted hooks add the corrupted activations to the activation difference matrix
+         # The forward clean hooks subtract the clean activations
+         # The backward hooks get the gradient, and use that, plus the activation difference, for the scores
++        alignment_state = {} if position_maps is not None else None
+         (fwd_hooks_corrupted, fwd_hooks_clean, bwd_hooks), activation_difference = (
+-            make_hooks_and_matrices(model, graph, batch_size, n_pos, scores)
++            make_hooks_and_matrices(
++                model,
++                graph,
++                batch_size,
++                n_pos,
++                scores,
++                position_maps=position_maps,
++                alignment_state=alignment_state,
++            )
+         )
+ 
+         with torch.inference_mode():
+@@ -261,10 +287,21 @@ def get_scores_eap_ig(
+             with model.hooks(fwd_hooks=fwd_hooks_clean):
+                 clean_logits = model(clean_tokens, attention_mask=clean_attention_mask)
+ 
+-            input_activations_clean = (
+-                input_activations_corrupted
+-                - activation_difference[:, :, graph.forward_index(graph.nodes["input"])]
+-            )
++            if position_maps is None:
++                input_activations_clean = (
++                    input_activations_corrupted
++                    - activation_difference[:, :, graph.forward_index(graph.nodes["input"])]
++                )
++            else:
++                # At unmapped coordinates, interpolate clean-to-clean so the
++                # changed framing span is not replaced by artificial zeros.
++                input_activations_clean, input_activations_corrupted = (
++                    _build_eap_ig_input_endpoints(
++                        alignment_state["clean_input_full"],
++                        alignment_state["aligned_corrupted_input"],
++                        alignment_state["valid_positions"],
++                    )
++                )
+ 
+         def input_interpolation_hook(k: int):
+             def hook_fn(activations, hook):
+diff --git a/src/circuitkit/backends/eap/attribute_node.py b/src/circuitkit/backends/eap/attribute_node.py
+index ad665ae..83a95e3 100644
+--- a/src/circuitkit/backends/eap/attribute_node.py
++++ b/src/circuitkit/backends/eap/attribute_node.py
+@@ -13,6 +13,8 @@ from ...utils.logging import get_logger
+ logger = get_logger("eap.attribute_node")
+ 
+ from .eap_utils import (
++    _build_eap_ig_input_endpoints,
++    _map_corrupted_positions,
+     compute_mean_activations,
+     grads_through_embeddings_only,
+     tokenize_batch_pair,
+@@ -27,6 +29,8 @@ def make_hooks_and_matrices(
+     n_pos: int,
+     scores: Optional[Tensor],
+     neuron: bool = False,
++    position_maps=None,
++    alignment_state=None,
+ ):
+     """
+     Build the activation-difference buffer and the forward/backward hooks needed for node-level attribution.
+@@ -89,12 +93,30 @@ def make_hooks_and_matrices(
+     # we add in the corrupted activations (add = True) and subtract out the clean ones (add=False)
+     # In the separate_activations case, we just store them in two halves of the matrix. Less efficient,
+     # but necessary for models with Gemma's architecture.
+-    def activation_hook(index, activations: torch.Tensor, hook: HookPoint, add: bool = True):
++    if position_maps is not None and model.cfg.use_normalization_before_and_after:
++        raise NotImplementedError(
++            "Position maps are unsupported for separate-activation normalization models"
++        )
++    valid_positions = None
+ 
++    def activation_hook(index, activations: torch.Tensor, hook: HookPoint, add: bool = True):
++        nonlocal valid_positions
+         acts = activations.detach()
+         act_d = acts.shape[-1]
+         try:
+-            if add:
++            if position_maps is not None:
++                if add:
++                    aligned, valid = _map_corrupted_positions(acts, position_maps)
++                    valid_positions = valid
++                    if alignment_state is not None and index == graph.forward_index(graph.nodes["input"]):
++                        alignment_state["aligned_corrupted_input"] = aligned.clone()
++                        alignment_state["valid_positions"] = valid.clone()
++                    activation_difference[:, :, index, :act_d] += aligned
++                else:
++                    if alignment_state is not None and index == graph.forward_index(graph.nodes["input"]):
++                        alignment_state["clean_input_full"] = acts.clone()
++                    activation_difference[:, :, index, :act_d] -= acts
++            elif add:
+                 activation_difference[:, :, index, :act_d] += acts
+             else:
+                 activation_difference[:, :, index, :act_d] -= acts
+@@ -124,6 +146,9 @@ def make_hooks_and_matrices(
+ 
+         grads = gradients.detach()
+         grad_d = grads.shape[-1]
++        if position_maps is not None and valid_positions is not None:
++            mask_shape = (*valid_positions.shape, *((1,) * (grads.ndim - 2)))
++            grads = grads * valid_positions.to(device=grads.device).reshape(mask_shape)
+         try:
+             if neuron:
+                 s = einsum(
+@@ -1176,7 +1201,14 @@ def get_scores_eap(
+     templated = getattr(dataloader, "templated", False)
+     dataloader = dataloader if quiet else tqdm(dataloader)
+ 
+-    for clean, corrupted, label in dataloader:
++    for batch in dataloader:
++        if len(batch) == 3:
++            clean, corrupted, label = batch
++            position_maps = None
++        elif len(batch) == 4:
++            clean, corrupted, label, position_maps = batch
++        else:
++            raise ValueError("EAP batches must be (clean, corrupted, label[, position_maps])")
+         batch_size = len(clean)
+         total_items += batch_size
+ 
+@@ -1192,7 +1224,10 @@ def get_scores_eap(
+         )
+ 
+         (fwd_hooks_corrupted, fwd_hooks_clean, bwd_hooks), activation_difference = (
+-            make_hooks_and_matrices(model, graph, batch_size, n_pos, scores, neuron=neuron)
++            make_hooks_and_matrices(
++                model, graph, batch_size, n_pos, scores, neuron=neuron,
++                position_maps=position_maps,
++            )
+         )
+ 
+         with torch.inference_mode():
+@@ -1282,7 +1317,14 @@ def get_scores_eap_ig(
+     templated = getattr(dataloader, "templated", False)
+     dataloader = dataloader if quiet else tqdm(dataloader)
+ 
+-    for clean, corrupted, label in dataloader:
++    for batch in dataloader:
++        if len(batch) == 3:
++            clean, corrupted, label = batch
++            position_maps = None
++        elif len(batch) == 4:
++            clean, corrupted, label, position_maps = batch
++        else:
++            raise ValueError("EAP-IG batches must be (clean, corrupted, label[, position_maps])")
+         batch_size = len(clean)
+         total_items += batch_size
+ 
+@@ -1301,8 +1343,12 @@ def get_scores_eap_ig(
+         # The forward corrupted hooks add the corrupted activations to the activation difference matrix
+         # The forward clean hooks subtract the clean activations
+         # The backward hooks get the gradient, and use that, plus the activation difference, for the scores
++        alignment_state = {} if position_maps is not None else None
+         (fwd_hooks_corrupted, fwd_hooks_clean, bwd_hooks), activation_difference = (
+-            make_hooks_and_matrices(model, graph, batch_size, n_pos, scores, neuron=neuron)
++            make_hooks_and_matrices(
++                model, graph, batch_size, n_pos, scores, neuron=neuron,
++                position_maps=position_maps, alignment_state=alignment_state,
++            )
+         )
+ 
+         with torch.inference_mode():
+diff --git a/src/circuitkit/backends/eap/eap_utils.py b/src/circuitkit/backends/eap/eap_utils.py
+index 6a651be..730cc00 100644
+--- a/src/circuitkit/backends/eap/eap_utils.py
++++ b/src/circuitkit/backends/eap/eap_utils.py
+@@ -74,6 +74,41 @@ def collate_EAP(xs):
+     return clean, corrupted, labels
+ 
+ 
++def collate_EAP_with_position_maps(xs, tokenizer, padding_side="left"):
++    """Collate paired EAP rows carrying explicit per-example position maps.
++
++    Each item is ``(clean, corrupted, label, (clean_positions, corrupt_positions))``.
++    Position arrays stay as per-row Python tuples so variable map lengths are not
++    padded or implicitly interpreted as token positions by PyTorch.
++    """
++    if padding_side not in {"left", "right"}:
++        raise ValueError("padding_side must be 'left' or 'right'")
++    if not xs or any(len(item) != 4 for item in xs):
++        raise ValueError("Every mapped EAP sample must contain clean, corrupted, label, and map")
++    clean, corrupted, labels, position_maps = zip(*xs)
++    def token_length(text):
++        ids = tokenizer(text, add_special_tokens=False)["input_ids"]
++        if ids and isinstance(ids[0], (list, tuple)):
++            ids = ids[0]
++        return len(ids)
++
++    clean_lengths = [token_length(text) for text in clean]
++    corrupt_lengths = [token_length(text) for text in corrupted]
++    sequence_length = max(max(clean_lengths), max(corrupt_lengths))
++    padded_maps = []
++    for (clean_pos, corrupt_pos), clean_len, corrupt_len in zip(
++        position_maps, clean_lengths, corrupt_lengths
++    ):
++        clean_offset = sequence_length - clean_len if padding_side == "left" else 0
++        corrupt_offset = sequence_length - corrupt_len if padding_side == "left" else 0
++        clean_padded = tuple(int(i) + clean_offset for i in clean_pos)
++        corrupt_padded = tuple(int(i) + corrupt_offset for i in corrupt_pos)
++        if any(i < 0 or i >= sequence_length for i in clean_padded + corrupt_padded):
++            raise ValueError("Padded position map is outside the joint sequence")
++        padded_maps.append((clean_padded, corrupt_padded))
++    return list(clean), list(corrupted), torch.tensor(labels), padded_maps
++
++
+ def collate_EAP_with_spans(xs):
+     """
+     Collate a list of EAP dataset samples into a batch with support for answer spans.
+@@ -334,8 +369,54 @@ def tokenize_batch_pair(
+     return clean_tokens, corr_tokens, clean_mask, corr_mask, clean_lengths, n_pos
+ 
+ 
++def _map_corrupted_positions(activations: Tensor, position_maps):
++    """Gather each corrupted row into clean coordinates using explicit maps.
++
++    ``position_maps`` contains one ``(clean_positions, corrupted_positions)``
++    pair per row. Unmapped positions are zero and false in the returned mask.
++    The helper intentionally does not infer semantic correspondence.
++    """
++    if len(position_maps) != activations.shape[0]:
++        raise ValueError("position_maps must contain one map per batch row")
++    aligned = torch.zeros_like(activations)
++    valid = torch.zeros(activations.shape[:2], dtype=torch.bool, device=activations.device)
++    for row, pair in enumerate(position_maps):
++        if len(pair) != 2:
++            raise ValueError("Each position map must be (clean_positions, corrupted_positions)")
++        clean_pos = torch.as_tensor(pair[0], dtype=torch.long, device=activations.device)
++        corrupt_pos = torch.as_tensor(pair[1], dtype=torch.long, device=activations.device)
++        if clean_pos.ndim != 1 or corrupt_pos.ndim != 1 or clean_pos.numel() != corrupt_pos.numel():
++            raise ValueError("Mapped position arrays must be one-dimensional and equal length")
++        if clean_pos.numel() == 0:
++            raise ValueError("Each position map must contain at least one mapped position")
++        if torch.any(clean_pos < 0) or torch.any(clean_pos >= activations.shape[1]):
++            raise ValueError("Mapped clean position is out of bounds")
++        if torch.any(corrupt_pos < 0) or torch.any(corrupt_pos >= activations.shape[1]):
++            raise ValueError("Mapped corrupted position is out of bounds")
++        if clean_pos.unique().numel() != clean_pos.numel() or corrupt_pos.unique().numel() != corrupt_pos.numel():
++            raise ValueError("Position maps must be one-to-one")
++        aligned[row, clean_pos] = activations[row, corrupt_pos]
++        valid[row, clean_pos] = True
++    return aligned, valid
++
++
++def _build_eap_ig_input_endpoints(clean: Tensor, aligned_corrupted: Tensor, valid: Tensor):
++    """Use clean values at unmapped sites and mapped corrupt values elsewhere."""
++    if clean.shape != aligned_corrupted.shape or valid.shape != clean.shape[:2]:
++        raise ValueError("Clean, corrupted, and validity-mask shapes do not align")
++    mask = valid.reshape(*valid.shape, *([1] * (clean.ndim - 2)))
++    corrupted_endpoint = torch.where(mask, aligned_corrupted, clean)
++    return clean, corrupted_endpoint
++
++
+ def make_hooks_and_matrices(
+-    model: HookedTransformer, graph: Graph, batch_size: int, n_pos: int, scores: Optional[Tensor]
++    model: HookedTransformer,
++    graph: Graph,
++    batch_size: int,
++    n_pos: int,
++    scores: Optional[Tensor],
++    position_maps=None,
++    alignment_state=None,
+ ):
+     """
+     Build the activation-difference matrix and associated forward/backward hooks for EAP attribution.
+@@ -370,6 +451,12 @@ def make_hooks_and_matrices(
+                 [2, batch, pos, n_forward, d_model] for post-attn-LN models.
+     """
+     separate_activations = model.cfg.use_normalization_before_and_after and scores is None
++    if position_maps is not None and len(position_maps) != batch_size:
++        raise ValueError("position_maps must contain one map per batch row")
++    if position_maps is not None and separate_activations:
++        raise NotImplementedError(
++            "position_maps are not implemented for separate-activation normalization models"
++        )
+     _d_model = model.cfg.d_model
+     _d_mlp = graph.cfg.get("d_mlp", getattr(model.cfg, "d_mlp", _d_model))
+     max_d = max(_d_model, _d_mlp) if graph.cfg.get("mlp_hook") == "post_act" else _d_model
+@@ -389,15 +476,43 @@ def make_hooks_and_matrices(
+     fwd_hooks_clean = []
+     fwd_hooks_corrupted = []
+     bwd_hooks = []
++    valid_positions = None
++    aligned_corrupted_input = None
++    clean_input_full = None
+ 
+     # Fills up the activation difference matrix. In the default case (not separate_activations),
+     # we add in the corrupted activations (add = True) and subtract out the clean ones (add=False)
+     # In the separate_activations case, we just store them in two halves of the matrix. Less efficient,
+     # but necessary for models with Gemma's architecture.
+     def activation_hook(index, activations, hook, add: bool = True):
++        nonlocal valid_positions, aligned_corrupted_input, clean_input_full
+         acts = activations.detach()
+         act_d = acts.shape[-1]
+         try:
++            if position_maps is not None:
++                if add:
++                    aligned_acts, valid = _map_corrupted_positions(acts, position_maps)
++                    if valid_positions is None:
++                        valid_positions = valid
++                        if alignment_state is not None:
++                            alignment_state["valid_positions"] = valid
++                    elif not torch.equal(valid_positions, valid):
++                        raise ValueError("Position map validity mask changed across hooks")
++                    if index == graph.forward_index(graph.nodes["input"]):
++                        aligned_corrupted_input = aligned_acts.clone()
++                        if alignment_state is not None:
++                            alignment_state["aligned_corrupted_input"] = aligned_acts.clone()
++                    activation_difference[:, :, index, :act_d] += aligned_acts
++                else:
++                    if index == graph.forward_index(graph.nodes["input"]):
++                        clean_input_full = acts.clone()
++                        if alignment_state is not None:
++                            alignment_state["clean_input_full"] = acts.clone()
++                    position_mask = valid_positions.reshape(
++                        *valid_positions.shape, *([1] * (acts.ndim - 2))
++                    )
++                    activation_difference[:, :, index, :act_d] -= acts * position_mask
++                return
+             if separate_activations:
+                 if add:
+                     activation_difference[0, :, :, index, :act_d] += acts
+@@ -428,6 +543,13 @@ def make_hooks_and_matrices(
+         """
+         grads = gradients.detach()
+         try:
++            if position_maps is not None:
++                if valid_positions is None:
++                    raise RuntimeError("Corrupted forward pass must initialize position maps first")
++                mask = valid_positions.reshape(
++                    *valid_positions.shape, *([1] * (grads.ndim - 2))
++                )
++                grads = grads * mask
+             if grads.ndim == 3:
+                 grads = grads.unsqueeze(2)
+             grad_d = grads.shape[-1]

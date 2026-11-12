@@ -3,19 +3,40 @@
 from contextlib import contextmanager
 from pathlib import Path
 import shutil
+import socket
+import errno
 import subprocess
 import time
 
 import chat
 
 
+class PortInUseError(RuntimeError):
+    """An existing listener owns the requested port; never stop that process."""
+
+
+def available_port():
+    """Ask the OS for a loopback port; launcher still checks it before binding."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        listener.bind(("127.0.0.1", 0))
+        return listener.getsockname()[1]
+
+
 def require_free_port(port):
     if chat.server_status(f"http://127.0.0.1:{port}") != "offline":
-        raise RuntimeError(f"Port {port} is occupied. Stop that server or choose another port.")
+        raise PortInUseError(f"Port {port} is occupied. Stop that server or choose another port.")
+    # Health checks alone miss non-HTTP listeners. Probe actual bind availability.
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        try:
+            listener.bind(("127.0.0.1", port))
+        except OSError as error:
+            if error.errno == errno.EADDRINUSE:
+                raise PortInUseError(f"Port {port} is occupied. Choose another port.") from error
+            raise
 
 
 @contextmanager
-def local_server(model, port, log_path, guard=False, timeout=900, *, model_path=None, gpu_layers=None):
+def local_server(model, port, log_path, guard=False, timeout=900, *, model_path=None, gpu_layers=None, context_size=4096):
     require_free_port(port)
     executable = shutil.which("llama-server")
     if executable is None:
@@ -31,7 +52,7 @@ def local_server(model, port, log_path, guard=False, timeout=900, *, model_path=
         model_args = ["-m", str(model_path), "--alias", model]
     command = [
         executable, *model_args, "--host", "127.0.0.1", "--port", str(port),
-        "--ctx-size", "4096", "--parallel", "1", "--no-context-shift",
+        "--ctx-size", str(context_size), "--parallel", "1", "--no-context-shift",
     ]
     if gpu_layers is not None:
         command.extend(["--gpu-layers", str(gpu_layers)])
@@ -49,6 +70,11 @@ def local_server(model, port, log_path, guard=False, timeout=900, *, model_path=
         next_update = time.monotonic() + 15
         while True:
             if process.poll() is not None:
+                # A listener may claim the port after our preflight bind probe.
+                # Let automatic-port callers retry this specific startup failure.
+                tail = log_path.read_text(errors="replace")[-16384:]
+                if "address already in use" in tail.lower():
+                    raise PortInUseError(f"Port {port} became occupied during startup.")
                 raise RuntimeError(f"llama-server exited. Inspect {log_path}")
             status = chat.server_status(base_url)
             if status == "ready":

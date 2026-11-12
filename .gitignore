@@ -13,3 +13,4 @@ data_ready/answercarefully_*.sqlite3*
 /eval_aya_answers.jsonl
 /eval_scores.jsonl
 runs/evaluation-review-*/
+/evaluations/

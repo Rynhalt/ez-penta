@@ -1,0 +1,6 @@
+{
+  "dataset_sha256": "296be6962f573eac1133f099eac098a16318b3d708e1cc9e541ea6fb53eea21f",
+  "manifest_id": "1bb4b6cd6aaec7188979ca9992ad327684ebd02d1025b5874bae8b18d7c7721f",
+  "algorithm": "paired-dp-v1-seed42",
+  "prompt_count": 21184
+}

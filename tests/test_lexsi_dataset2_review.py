@@ -43,6 +43,7 @@ class LexsiReviewTests(unittest.TestCase):
             {"reviewer_ids": ["a", " A "]},
             {"refusal_rp": "partial_refusal"},
             {"corrupted_answer": "Absent evidence"},
+            {"corrupted_answer": "continuation."},
         ):
             with self.assertRaises(ValueError):
                 approved_pairs([row], {"row": {**approval, **updated}})

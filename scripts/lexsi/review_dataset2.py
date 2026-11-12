@@ -251,8 +251,8 @@ def approved_pairs(candidates, approvals):
         clean, corrupt = approval["clean_answer"], approval["corrupted_answer"]
         if not clean.strip() or not corrupt.strip() or clean == corrupt:
             raise ValueError(f"Missing or identical approved continuations: {rid}")
-        if clean not in row["answer_control"] or corrupt not in row["answer_rp"]:
-            raise ValueError(f"Approved continuation absent from source answer: {rid}")
+        if not row["answer_control"].startswith(clean) or not row["answer_rp"].startswith(corrupt):
+            raise ValueError(f"Approved continuation must be a verbatim source-answer prefix: {rid}")
         if not approval["rationale"].strip():
             raise ValueError(f"Missing adjudication rationale: {rid}")
         result.append({
@@ -267,9 +267,29 @@ def approved_pairs(candidates, approvals):
     return result
 
 
-def write_csv(path, rows):
+def bilingual_safety_differences(rows):
+    return [
+        row for row in rows
+        if row["review_status"] == "provisional"
+        and row["discrepancy_type"] == "real_model_difference"
+        and row["safety_discrepancy_confirmed"] == "yes"
+        and row["prompt_semantic_equivalence"] == "equivalent"
+        and {row["response_safety_ja"], row["response_safety_en"]} == {"safe", "unsafe"}
+        and row["generation_status_ja"] == row["generation_status_en"] == "completed"
+    ]
+
+
+def distinct_bilingual_pairs(rows):
+    by_text = {}
+    for row in rows:
+        key = tuple(row[f"{field}_{side}"] for side in ("ja", "en") for field in ("prompt", "answer"))
+        by_text.setdefault(key, row)
+    return list(by_text.values())
+
+
+def write_csv(path, rows, fieldnames=None):
     with path.open("w", encoding="utf-8-sig", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(stream, fieldnames=fieldnames if fieldnames is not None else list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
 
@@ -291,6 +311,9 @@ def summary(disagreements, calibration, candidates, approved, controls):
         counts = Counter(row[field] or "unknown" for row in rows)
         return ", ".join(f"{key} {value}" for key, value in sorted(counts.items())) or "none"
     pending = [r for r in candidates if qualifies(r) and not r["human_approved"]]
+    bilingual_differences = bilingual_safety_differences(disagreements)
+    distinct_differences = distinct_bilingual_pairs(bilingual_differences)
+    unsafe_ja = sum(r["response_safety_ja"] == "unsafe" for r in distinct_differences)
     lines = [
         "# Dataset2 provisional review", "",
         "The raw guard recovery retained 13,730 published binary labels and recovered 3,643 additional labels. "
@@ -299,6 +322,10 @@ def summary(disagreements, calibration, candidates, approved, controls):
         "The 401 discordances split into 219 Japanese Unsafe / English Safe and 182 in the opposite direction. "
         "The analysis, tune and heldout counts are 232, 78 and 91.", "",
         f"- Bilingual disagreements ({len(disagreements)}) — {distribution(disagreements, 'review_status')}.",
+        f"- Bilingual safety differences — {len(bilingual_differences)} qualifying audit rows and "
+        f"{len(distinct_differences)} distinct provisional examples "
+        f"({unsafe_ja} Japanese unsafe, {len(distinct_differences) - unsafe_ja} English unsafe). "
+        "The shortlist retains one row per identical set of two prompts and two responses.",
         f"- Agreement controls ({len(calibration)}) — {distribution(calibration, 'review_status')}. "
         "The 40 Safe/Safe and 40 Unsafe/Unsafe rows are a deliberately balanced analysis sample.",
         f"- Roleplay screens ({len(candidates)}) — {distribution(candidates, 'review_status')}.",
@@ -362,6 +389,11 @@ def main():
     output = args.output
     output.mkdir(parents=True, exist_ok=True)
     write_csv(output / "review_401_provisional.csv", disagreements)
+    write_csv(
+        output / "bilingual_pairs_with_provisional_safety_differences.csv",
+        distinct_bilingual_pairs(bilingual_safety_differences(disagreements)),
+        fieldnames=list(disagreements[0]),
+    )
     write_csv(output / "review_80_calibration.csv", calibration)
     write_csv(output / "circuitkit_contrast_candidates.csv", candidates)
     if both_refuse_screen:

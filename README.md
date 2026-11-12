@@ -2,7 +2,66 @@
 
 Local Japanese-English safety experiments with Tiny Aya, AnswerCarefully, and AuditKIT.
 
-## Run on a Colab GPU
+## Research pipeline: start here
+
+The notebooks are the main interface. They contain the settings, model choices,
+strategy templates, stage-by-stage calls, explanations, and inspection tables.
+Small Python helpers hold reusable batching, checkpoint, scoring, and comparison
+mechanics so these can be tested without a GPU.
+
+| Stage | Notebook / code | Output |
+| --- | --- | --- |
+| Freeze the source | `data_ready/fetch_answercarefully.sh` | Original bilingual SQLite snapshot |
+| Prepare Qwen variants | [prepare_prompt_variants.ipynb](data_ready/prepare_prompt_variants.ipynb) | Versioned fiction, roleplay, or refusal-suppression rewrites with quality flags |
+| Prepare deterministic variants | `data_ready/jb_simple_no_llm.ipynb` | Character-insertion variants |
+| Compile prompts | `data_ready/view/compile_test_prompts.ipynb` | `answercarefully_test_prompts_v2.sqlite3`, retaining provenance and truncation flags |
+| Generate, judge, compare | [eval_jp_en_variants.ipynb](eval/eval_jp_en_variants.ipynb) | Per-answer judgments, full pair table, matched transitions, and denominators |
+
+The evaluation notebook defaults to **`MODE = "saved"`**. Put
+`answercarefully_eval.sqlite3`, `eval_aya_answers.jsonl`, and `eval_scores.jsonl`
+in the shared folder for Colab, or the repository root locally.
+For a folder under **Shared with me**, add a shortcut to it in **My Drive** named
+`ez-penta` (Organize → Add shortcut). The notebook defaults to
+`/content/drive/MyDrive/ez-penta`; set `DRIVE_FOLDER` to the exact mounted shortcut
+name if yours differs. The original shared folder can be named `ez_penta`.
+The notebook reads through that shortcut; the original folder and
+files are not moved or copied. A Drive URL or folder ID is not a filesystem path.
+For Workspace Shared drives, set `DATA_DIR` to the actual mounted path instead.
+Run the notebook
+in order to reanalyze these exports on CPU, without downloading models or calling
+a judge. All results go to a **new** `evaluations/<run ID>/` folder in the same
+data directory. The source artifacts remain unchanged.
+
+For new GPU experiments choose `MODE = "run"`. `STAGES = [300]` is a pilot; use
+`[300, None]` to extend to all eligible sources. Each run has separate answer and
+score JSONL checkpoints plus configuration metadata. Set `RESUME_RUN_ID` to that
+folder name to resume; incompatible settings/input hashes are rejected. Set it
+empty for a new run. The notebook can clone the helper code or prompt for uploads
+when local changes have not been pushed. Updating imported helpers requires a
+kernel restart. The notebook's package-install cell needs network access; saved
+analysis itself does not call an LLM or require a GPU.
+
+New prompt preparation defaults to preview-only. It keeps strategy definitions
+visible in one notebook and uses `data_ready/rewrite_helpers.py` for shared
+batching/checkpoints. The three older `jb_qwen_*.ipynb` notebooks remain as
+historical experiments, including their old settings and outputs. New v2 strategy
+templates do not reconstruct the historical generation configuration.
+
+For the full historical baseline, corrected analysis retains **14,400 expected
+pairs**, with **13,913 complete pairs**, **13,051 jointly binary-judged safety
+pairs**, and **13,913 similarity-eligible pairs**. Generation completion and
+safety labels are separate fields; unknown is never Safe. Rates include explicit
+denominators, and all expected cases remain visible. Guard labels and prompt
+equivalence still require human validation.
+
+The reusable research helpers are `eval/checkpoints.py`, `eval/scoring.py`, and
+`eval/analysis.py`. Ordinary tests use toy data and need no models or gated data:
+
+```sh
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+## Earlier GGUF experiment on a Colab GPU
 
 Open [notebooks/answercarefully_colab.ipynb](notebooks/answercarefully_colab.ipynb)
 in [Google Colab](https://colab.research.google.com/) using **File → Upload notebook**,
@@ -45,7 +104,7 @@ Notebook code and mocked workflow tests are checked locally; NVIDIA execution
 must be verified in Colab. GPU availability and runtime limits vary. Clear outputs
 before sharing the notebook; AnswerCarefully records must remain private.
 
-## Run everything (macOS)
+## Local interactive / GGUF workflow (macOS)
 
 Install [Homebrew](https://brew.sh/) and accept access to
 [llm-jp/AnswerCarefully](https://huggingface.co/datasets/llm-jp/AnswerCarefully)
@@ -245,3 +304,13 @@ Tests use simulated responses and localhost sockets; they need no model or datas
 
 `.venv`, model files, and the review database are git-ignored. Keep tokens and
 AnswerCarefully records private; do not publish reports or notebook outputs containing original data.
+
+### Dataset2 parallel Colab evaluation
+
+Use [Part 1](eval/eval_dataset2_part1.ipynb) and [Part 2](eval/eval_dataset2_part2.ipynb) for the complete retained Dataset2 evaluation. Each independent notebook processes 160 seeds / 10,592 prompts using one shared implementation. See [execution and merge instructions](eval/DATASET2_RUN.md) and [technical evidence and limitations](eval/DATASET2_RESEARCH.md).
+
+Both notebooks include their dataset and shared code and prepare them automatically; no ZIP upload is needed. Maintainers refresh the embedded files with `python -m eval.package_dataset2_colab --embed-notebooks`. Validate locally with `python -m eval.validate_dataset2`; merge exported shard directories with `python -m eval.merge_dataset2_results --part1 PATH --part2 PATH --output PATH`. These notebooks preserve all retained prompts and quality flags; automated safety/refusal measurements do not establish human-validated correctness.
+
+The consolidated [Dataset2 → CircuitKIT handoff](eval/DATASET2_HANDOFF.md) maps every evaluation artifact to its intended use, explains validated candidate-pair selection, and identifies the adapter and causal-validation work that remains.
+
+Dataset2's current default uses local GGUF inference through llama.cpp (Tiny Aya Q4_K_M, Qwen3Guard Q8_0). Outputs go to `My Drive/ez-penta/dataset2_eval_gguf/part1/` and `part2/`. Public model files and GPU builds are cached in Drive; the default workflow does not require the gated fp16 checkpoint or Transformers/Hub installation.
