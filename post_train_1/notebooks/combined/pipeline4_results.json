@@ -1,0 +1,10 @@
+{
+  "target_layers": [
+    18,
+    23
+  ],
+  "n_training_pairs": 22,
+  "circuit_restricted_checkpoint": "/content/pipeline4_restricted",
+  "full_finetune_checkpoint": "/content/pipeline4_full",
+  "full_finetune_completed": true
+}

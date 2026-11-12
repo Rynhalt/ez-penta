@@ -1,0 +1,21 @@
+{
+  "baseline": {
+    "or_mh": NaN,
+    "chi2_mh": 0.0,
+    "p_mh": 1.0,
+    "n_pairs": 1
+  },
+  "fixed": {
+    "or_mh": NaN,
+    "chi2_mh": 0.5547850208044385,
+    "p_mh": 0.4563691017848581,
+    "n_pairs": 2
+  },
+  "pipeline1_full_dataset_baseline": {
+    "or_mh": 1.9822024722961555,
+    "ci_lo": 1.5831753321715596,
+    "ci_hi": 2.481801327581078,
+    "p_mh": 2.2075405470463405e-09
+  },
+  "n_validation_prompts": 40
+}

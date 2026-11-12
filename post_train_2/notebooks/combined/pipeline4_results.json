@@ -1,0 +1,12 @@
+{
+  "target_layers": [
+    18
+  ],
+  "n_training_pairs": 195,
+  "circuit_restricted_checkpoint": "/content/pipeline4_restricted",
+  "full_finetune_checkpoint": "/content/pipeline4_full",
+  "full_finetune_completed": true,
+  "circuit_restricted_adapter": "/content/pipeline4_restricted_adapter",
+  "full_finetune_adapter": "/content/pipeline4_full_adapter",
+  "max_len": 768
+}
