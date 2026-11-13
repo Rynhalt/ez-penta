@@ -33,3 +33,6 @@ post_train_*/notebooks/combined/*_adapter/
 *_FAILED.ipynb
 runs/*.log
 runs/answercarefully-*/*.log
+
+# Adapters unzipped by post_train_2/view_evals notebooks (up to 121MB)
+post_train_2/view_evals/outputs/pipeline4_*_adapter/
