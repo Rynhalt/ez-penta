@@ -1,0 +1,65 @@
+{
+ "created_utc": "2026-11-16T06:20:40Z",
+ "experiment": "x_steer A",
+ "agent": "agent1",
+ "hardware": "local CPU (arm64, Darwin 25.4.0)",
+ "gpu": null,
+ "versions": {
+  "python": "3.14.7",
+  "numpy": "2.5.4",
+  "pandas": "3.1.1",
+  "sklearn": "1.9.1"
+ },
+ "inputs": {
+  "s2_directions/manifest.json": "2f222fed8255616709f2e35274d039ebfd1d30a2c9775c5c4c036e6fea1c851c",
+  "s1_labels/manifest.json": "57182deb677aceb44a39e11d988fcae559931551e3efe4e01649912ddef4f027"
+ },
+ "n_prompts": 3864,
+ "n_twins": 1956,
+ "counts_refused_twins": {
+  "base|en": 99,
+  "base|ja": 101,
+  "en_s0|en": 367,
+  "en_s0|ja": 166
+ },
+ "L_A": 8,
+ "L_A_rule": "fallback_max(auc_ho-|cos|)",
+ "any_cell_qualifies": false,
+ "files": {
+  "directions_bal.npz": {
+   "bytes": 5695040,
+   "sha256": "11999ae4be560166dbf197073cee41d6cf8de86ea7053b9c10374780c7d8245d",
+   "rows": null
+  },
+  "diagnostics.csv": {
+   "bytes": 118673,
+   "sha256": "707ac0d6967ba604b3a7af20b1ab8b5be1463950d1a43c0f2a0c25b3993f7930",
+   "rows": 224
+  },
+  "diagnostics.json": {
+   "bytes": 292794,
+   "sha256": "375b025c95c3ad18a39a4b0cc3dda886ea5e12d94d2154ffa97d8d262de66258",
+   "rows": null
+  },
+  "counts.csv": {
+   "bytes": 937,
+   "sha256": "b5d9ff9a8c777b473f69c5480c9125918b2e1311ff301017c415eec3e3cfb79b",
+   "rows": 36
+  },
+  "report.md": {
+   "bytes": 5424,
+   "sha256": "fae5e98cc94365c9cbe89e55954e20940b887816abdb9c694f0438f8083b9109",
+   "rows": null
+  },
+  "figures/cos_auc_vs_layer.png": {
+   "bytes": 99170,
+   "sha256": "0fb53dccc44c55ee0b79d94f3745671db26e6c61226f5aa846a9999f42a0e450",
+   "rows": null
+  },
+  "figures/bias_vs_layer.png": {
+   "bytes": 46942,
+   "sha256": "4cb2cdf0c0417833b9a44dcb2f4df482c65cb43955ffac139a2cd0d2291390b1",
+   "rows": null
+  }
+ }
+}

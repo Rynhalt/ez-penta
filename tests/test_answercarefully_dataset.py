@@ -1,6 +1,6 @@
 import unittest
 
-from answercarefully_dataset import select_samples
+from data_ready.answercarefully_dataset import select_samples
 
 
 def original_row(identifier, risk_area):

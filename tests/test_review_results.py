@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from http.server import ThreadingHTTPServer
 
-from review_results import ReviewWorkspace, make_handler
+from eval.review_results import ReviewWorkspace, make_handler
 
 
 def create_run(root, run_id="example-run"):

@@ -1,0 +1,105 @@
+{
+  "unit_suites": [
+    {
+      "module": "test_answercarefully_dataset",
+      "exit_code": 0,
+      "tests_discovered": 5
+    },
+    {
+      "module": "test_evaluate_answercarefully",
+      "exit_code": 0,
+      "tests_discovered": 4
+    },
+    {
+      "module": "test_inspect_evaluation",
+      "exit_code": 0,
+      "tests_discovered": 3
+    },
+    {
+      "module": "test_review_results",
+      "exit_code": 0,
+      "tests_discovered": 8
+    },
+    {
+      "module": "test_launcher",
+      "exit_code": 0,
+      "tests_discovered": 5
+    },
+    {
+      "module": "test_colab_notebook",
+      "exit_code": 0,
+      "tests_discovered": 2
+    },
+    {
+      "module": "test_guard_judge",
+      "exit_code": 0,
+      "tests_discovered": 4
+    },
+    {
+      "module": "test_chat",
+      "exit_code": 0,
+      "tests_discovered": 5
+    },
+    {
+      "module": "test_local_server",
+      "exit_code": 0,
+      "tests_discovered": 7
+    },
+    {
+      "module": "test_huggingface_auth",
+      "exit_code": 0,
+      "tests_discovered": 4
+    },
+    {
+      "module": "test_dataset2_pipeline",
+      "exit_code": 0,
+      "tests_discovered": 35
+    },
+    {
+      "module": "test_dataset2_gguf",
+      "exit_code": 0,
+      "tests_discovered": 19
+    },
+    {
+      "module": "test_dataset2_uk",
+      "exit_code": 0,
+      "tests_discovered": 4
+    },
+    {
+      "module": "test_uk_hf_evaluation",
+      "exit_code": 0,
+      "tests_discovered": 5
+    }
+  ],
+  "tests_discovered": 110,
+  "tests_passed": 109,
+  "tests_skipped": 1,
+  "figure_pairs_generated": 6,
+  "report_validator": "passed",
+  "links_and_scientific_hashes": {
+    "documents": 14,
+    "missing_links": [],
+    "scientific_hashes_unchanged": {
+      "post_train_3/reports/source_data/steering_results.json": "86db79ad2a9b508eee5fa17dc2dc6d46cbb895c8a44a201838b607db7880f774",
+      "post_train_3/reports/source_data/xsteer_d_manifest.json": "15f88997381e0f93579d6c9244d512bc0a28d5599d86755f1faea48ec924f19e",
+      "post_train_3/reports/source_data/followups_results.json": "ffd599e1785228f5284acca2e40aec90b6161f4341c1d9e8d614be9a479347d5",
+      "post_train_3/reports/source_data/xsteer_d_results.json": "95288fedbaf713ba0626d097bd69f14f0f8fa95ac96330816456fef70d6e54b3",
+      "post_train_3/reports/source_data/bilingual_results.json": "dfeb7ea9c5cfd9bc84b6f03400023d2bce3192e3a6933d69e57bf46b0a872bd7",
+      "post_train_3/reports/source_data/xsteer_a_manifest.json": "1ac437db9a583018082d083eceb6ff1d7c84235bac73604ad38fdbd328fb6518",
+      "post_train_3/reports/source_data/xsteer_a_diagnostics.json": "375b025c95c3ad18a39a4b0cc3dda886ea5e12d94d2154ffa97d8d262de66258",
+      "post_train_3/japan_culture/ja/results.json": "070f39288c2102bd95929343e92129c137fbe064960aac7b6bda85189288f3bb",
+      "post_train_3/japan_culture/analysis_outputs/results.json": "070f39288c2102bd95929343e92129c137fbe064960aac7b6bda85189288f3bb",
+      "post_train_3/japan_culture/combined/results.json": "152020b884fb006dc8729a5fd8ecbdcdefd0e9afc8e1c8e407e7ca3fa6e18efe",
+      "reports/experiment_report.md": "39bec77802bc1c647605f24d5cfbb2bfd1117ba891b2ecd0c77dc8fda01dfecc",
+      "reports/submission_abstract.md": "03ba0a987a8267a3c9ebc9c35b931ad6af7917de1791637f5e3045196e9a71d6"
+    }
+  },
+  "archive_files": 196,
+  "archive_verification_counts": {
+    "Fresh SHA-256 plus inode/size": 20,
+    "Same inode and size; prior hash where available; no cloud rehydration": 173,
+    "Fresh SHA-256": 3
+  },
+  "git_diff_check": "passed (exit 0); exact HEAD objects fetched into temporary storage to avoid cloud-placeholder reads",
+  "cached_diff_check": "passed (exit 0)"
+}

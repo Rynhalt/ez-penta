@@ -68,7 +68,7 @@ def validate(dataset, manifest, output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", default="marcus/dataset2_partial.sqlite3")
+    parser.add_argument("--dataset", default="data_ready/dataset2_snapshot/dataset2_partial.sqlite3")
     parser.add_argument("--manifest", default="eval/manifests/dataset2_shards.csv")
     parser.add_argument("--output", default="/tmp/dataset2_validation")
     print(json.dumps(validate(**vars(parser.parse_args())), indent=2))

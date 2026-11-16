@@ -12,8 +12,8 @@ import time
 import unittest
 from unittest.mock import patch
 
-from answercarefully_dataset import select_samples
-from evaluate_answercarefully import (
+from data_ready.answercarefully_dataset import select_samples
+from eval.evaluate_answercarefully import (
     generate_responses, load_responses, evaluate_responses, write_json,
 )
 from test_answercarefully_dataset import original_row

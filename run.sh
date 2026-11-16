@@ -63,4 +63,4 @@ fi
 # Reuse the saved login; the helper prompts only when no credential is available.
 .venv/bin/python huggingface_auth.py
 
-exec .venv/bin/python -u evaluate_answercarefully.py run "$@"
+exec .venv/bin/python -u -m eval.evaluate_answercarefully run "$@"

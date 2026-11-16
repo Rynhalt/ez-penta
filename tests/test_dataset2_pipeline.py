@@ -36,7 +36,7 @@ from eval.dataset2_analysis import (
 from eval.merge_dataset2_results import merge
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "marcus/dataset2_partial.sqlite3"
+DB = ROOT / "data_ready/dataset2_snapshot/dataset2_partial.sqlite3"
 MANIFEST = ROOT / "eval/manifests/dataset2_shards.csv"
 
 
@@ -738,7 +738,7 @@ class AutomaticBootstrapTests(unittest.TestCase):
                                     name,
                                 )
                         original_time = (
-                            (target / "marcus/dataset2_partial.sqlite3")
+                            (target / "data_ready/dataset2_snapshot/dataset2_partial.sqlite3")
                             .stat()
                             .st_mtime_ns
                         )
@@ -748,7 +748,7 @@ class AutomaticBootstrapTests(unittest.TestCase):
                         previous_runner.close.assert_called_once_with()
                         self.assertNotIn("aya", namespace)
                         self.assertEqual(
-                            (target / "marcus/dataset2_partial.sqlite3")
+                            (target / "data_ready/dataset2_snapshot/dataset2_partial.sqlite3")
                             .stat()
                             .st_mtime_ns,
                             original_time,
@@ -811,7 +811,7 @@ class MetadataSetupTests(unittest.TestCase):
                         namespace,
                     )
                 self.assertEqual(
-                    (target / "marcus/dataset2_partial.sqlite3").read_bytes(),
+                    (target / "data_ready/dataset2_snapshot/dataset2_partial.sqlite3").read_bytes(),
                     DB.read_bytes(),
                 )
                 self.assertEqual(requests, [("get_ipynb", {"timeout_sec": 30})])

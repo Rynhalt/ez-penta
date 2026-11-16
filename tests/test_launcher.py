@@ -75,7 +75,7 @@ class LauncherTests(unittest.TestCase):
         result, calls = self.launch("--limit", "1", "--max-tokens", "256")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("huggingface_auth.py", calls)
-        self.assertIn("-u evaluate_answercarefully.py run --limit 1 --max-tokens 256", calls)
+        self.assertIn("-u -m eval.evaluate_answercarefully run --limit 1 --max-tokens 256", calls)
 
     def test_failed_install_does_not_start_experiment(self):
         result, calls = self.launch(BOOTSTRAP_INSTALL_FAILURE="1")

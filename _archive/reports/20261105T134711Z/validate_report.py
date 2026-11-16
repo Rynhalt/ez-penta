@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+ROOT = next(parent for parent in HERE.parents if (parent / "AGENTS.md").is_file())
 
 
 def sha(path):

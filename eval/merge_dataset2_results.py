@@ -34,7 +34,7 @@ def merge(
     part1,
     part2,
     output,
-    dataset="marcus/dataset2_partial.sqlite3",
+    dataset="data_ready/dataset2_snapshot/dataset2_partial.sqlite3",
     manifest="eval/manifests/dataset2_shards.csv",
 ):
     p, s = load_dataset(dataset)
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ["part1", "part2", "output"]:
         parser.add_argument("--" + name, required=True)
-    parser.add_argument("--dataset", default="marcus/dataset2_partial.sqlite3")
+    parser.add_argument("--dataset", default="data_ready/dataset2_snapshot/dataset2_partial.sqlite3")
     parser.add_argument("--manifest", default="eval/manifests/dataset2_shards.csv")
     args = parser.parse_args()
     _, coverage = merge(**vars(args))

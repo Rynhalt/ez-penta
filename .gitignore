@@ -15,27 +15,8 @@ data_ready/answercarefully_*.sqlite3*
 runs/evaluation-review-*/
 /evaluations/
 
-# Large dataset2 eval outputs (each > GitHub's 100MB file limit); regenerate with the eval
-# notebooks + notebooks/dataset2_2part_output_combiner.ipynb, or share them outside git.
-notebooks/combined/scores_current.jsonl
-notebooks/combined/results.sqlite3
-notebooks/combined/observations.csv
-notebooks/combined/manual_inspection.csv
-notebooks/combined/answers_current.jsonl
+# Private historical artifacts retain their pre-migration exclusions.
+/_archive/local_artifacts/
 
-# Trained LoRA adapters and model checkpoints (large binaries)
-post_train_*/notebooks/combined/*.zip
-post_train_*/notebooks/combined/*_adapter/
-*.bin
-*.pt
-
-# Failed-run notebook copies and local server/run logs
-*_FAILED.ipynb
-runs/*.log
-runs/answercarefully-*/*.log
-
-# Adapters unzipped by post_train_2/view_evals notebooks (up to 121MB)
-post_train_2/view_evals/outputs/pipeline4_*_adapter/
-
-# Hugging Face release build output (scripts/build_hf_release.py)
-outputs/hf_release/
+# Regenerable caches archived for reversible local cleanup.
+/_archive/regenerable/

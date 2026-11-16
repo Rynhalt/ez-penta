@@ -11,7 +11,7 @@ from unittest.mock import patch
 import auditkit as ak
 
 from guard_judge import LocalGuard, guard_messages, parse_guard
-from evaluate_answercarefully import load_responses, evaluate_responses
+from eval.evaluate_answercarefully import load_responses, evaluate_responses
 
 
 class GuardJudgeTests(unittest.TestCase):

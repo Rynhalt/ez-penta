@@ -31,7 +31,7 @@ FILES = [
     "eval/manifests/dataset2_shards.json",
     "eval/eval_dataset2_part1.ipynb",
     "eval/eval_dataset2_part2.ipynb",
-    "marcus/dataset2_partial.sqlite3",
+    "data_ready/dataset2_snapshot/dataset2_partial.sqlite3",
 ]
 
 

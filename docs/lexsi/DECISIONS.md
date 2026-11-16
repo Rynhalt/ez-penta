@@ -1,5 +1,18 @@
 # Dataset2 decision log
 
+## 2026-11-16 — Keep article claims tied to accessible experiment artifacts
+
+- Recomputed the abstract's pooled bilingual-study safety and harmless-refusal rates from the saved per-seed aggregate JSON and added exact counts to `reports/experiment_report.md`. These pooled rates are descriptive across one base run and three adapter runs; paired estimates remain the inferential results.
+- At the initial synthesis checkpoint, the prompt files and dedicated XSTEER result bundles had not yet been located. This artifact-status note is superseded by the later 2026-11-16 provenance revision below, which incorporates recovered XSTEER A/B/D evidence and leaves only C pending.
+- Kept the B5 refusal decomposition explicitly provisional: the accessible material is a narrative Drive summary, while the cited notebook and structured output are unavailable. No B5 chart or stronger mechanistic/causal claim is included.
+- Decision: these article edits do not change CircuitKIT eligibility or evidence gates. Behavioral adapter/steering outcomes do not establish EAP-IG circuit discovery or causal validation; automated labels remain provisional pending human review.
+
+## 2026-11-15 — Separate report synthesis from CircuitKIT evidence
+
+- Built a readable Tiny Aya experiment synthesis and figures from the saved steering, bilingual, and follow-up aggregate results. Source JSON hashes, claim mapping, and reproducibility instructions are recorded under `reports/` and `post_train_3/reports/source_data/`.
+- Excluded the restricted-versus-broad LoRA pilot from the quantitative figures because its raw/aggregate result bundle and checkpoint metadata were not verifiable in the accessible source set. Its supplied narrative is not a substitute for the source records.
+- Decision: keep all CircuitKIT checklist gates unchanged. These reports describe behavioral fine-tuning and an activation-direction weight edit; they do not establish CircuitKIT EAP-IG discovery or causal validation. Existing human-approval, data, and metric gates still apply.
+
 ## 2026-11-12 — Require complete prior-seed inventory for causal evaluation
 
 - Re-read the two current reviewer sheets: both contain 87 candidates and every review status remains blank. Keep the human-approved export empty.
@@ -389,3 +402,31 @@ Colab `userdata.get("HF_TOKEN")` cannot be invoked through CLI execution; it mus
 - Fetched the source via the existing pinned-loader workflow to ignored local path `data_ready/answercarefully.sqlite3`; revision `d1d4e57cd4d7aecb44f879e7488832011fcaddb0`, SHA256 `5fd99d9c294f3435f771e0b1dae6d22d232e1b0892815fd31e6577c10acb549f`.
 - Verified 1,800 unique rows (1,464 dev / 336 test), complete Japanese prompt/reference and English prompt-translation fields, no English reference answer, 1,067 dev / 245 test rows with adaptation tag 0, and no explicit `refusal_required` metadata. Aggregate output contains no text/IDs; tests pass 2/2.
 - Local Aya evaluation notebook has no execution outputs; prior Aya exposure on accessible Drive is unresolved. Decision: use dev rows only for candidate exploration after per-row language/intent review; keep test split sealed and do not call it fresh. Do not upload/copy this non-redistributable dataset to Drive or Git. Audit artifacts: `scripts/lexsi/audit_answercarefully_snapshot.py`, `outputs/lexsi/answercarefully_snapshot_audit_20261112.json`.
+
+## 2026-11-16 — Keep article/toolkit attribution separate from CircuitKIT gates
+
+- Article synthesis recovered the completed XSTEER B all-layer diagnostic from Drive. Its report evaluates 36 layers across base, `en_s0`, `ja_s0` and `bi_s0`; no tested model/language/layer met the joint refusal-readability and low-harm-alignment thresholds. XSTEER D remains a separate forward-hook intervention result.
+- Decision: describe SafeTune, CuratorKIT, AuditKit/Qwen3Guard and CircuitKIT by their verified code roles. Do not call SafeTune direction probing or XSTEER hook edits CircuitKIT circuit discovery. BI/XSTEER runs with direct Qwen3Guard calls must not be attributed to AuditKit.
+- Saved prompts/responses remain untrusted data. Automated/LLM review is provisional; no CircuitKIT input export is approved by this article task. Preserve all human approval, dataset alignment and metric validity gates in `CIRCUITKIT_ROADMAP.md`.
+- The XSTEER C run is not finalized in this article. B5 remains unverified at row level. No inference, training, destructive reorganization, CircuitKIT export, commit or push was performed for this report revision.
+
+## 2026-11-16 — Owner-authorized repository archive
+
+- The owner authorized reorganization in this checkout and root `archive/` for superseded material. Historical report/local runs/session notes are moved with pre-move SHA-256 checks; canonical reports receive navigation indexes.
+- Preserve active `post_train_3/`, source imports, notebook paths, root evaluation defaults and `marcus/` (used by tests). Leave the active virtual environment and CircuitKIT outputs in place.
+- No raw data is newly approved for publication, no CircuitKIT inputs are exported, and no Git commit/push is performed.
+
+### Root cleanup follow-up — 2026-11-16
+
+- Earlier decision to leave `marcus/` and `review_ui/` at root is superseded: references justify preserving files, not their old location. Move the data snapshot to `data_ready/dataset2_snapshot/` and UI assets to `eval/review_ui/`, updating live consumers and embedded notebook assets. Original data/UI hashes are retained in the follow-up manifest.
+
+### AnswerCarefully layout — 2026-11-16
+
+- Move dataset selection to `data_ready/answercarefully_dataset.py` and three distinct evaluation/inspection/review implementations to `eval/`. Update commands/imports/notebook upload mapping and preserve data and scientific results. These are complementary stages, not redundant copies. CircuitKIT approval gates remain unchanged.
+
+## 2026-11-16 — Article-driven `_archive/` cleanup
+
+- Owner requested actual safe archival around the canonical article. Integrate the prior archive, preserve the old root workflow documentation and superseded internal reviews, and archive regenerable caches. Document exact file moves and reasons in `_archive/ARCHIVE_MANIFEST.csv`.
+- Keep all unique scientific results/negative findings, JA paired analysis inputs and runtime-required eval_work. Static absence of a caller is insufficient to discard recovery scripts or published notebooks. Cloud placeholders remain explicitly under review when content was not inspected.
+- Large inherited cloud artifacts are checked by inode/size and prior hash records where available; do not mislabel that as a fresh full-byte hash verification. Source/report scientific hash guards remain separate from this archive-integration check.
+- Existing contributor approval and metric gates remain unchanged. This cleanup authorizes no CircuitKIT execution export or public release of raw model content.

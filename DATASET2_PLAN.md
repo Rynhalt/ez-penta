@@ -112,8 +112,8 @@ Dataset-generation and inspection notebooks:
 
 Dataset files:
 
-- `marcus/dataset2_partial.sqlite3`
-- `marcus/dataset2_high_coverage_incomplete.csv`
+- `data_ready/dataset2_snapshot/dataset2_partial.sqlite3`
+- `data_ready/dataset2_snapshot/dataset2_high_coverage_incomplete.csv`
 
 Also inspect available tests, package requirements, Colab-specific setup, and any relevant existing pipeline code.
 

@@ -8,10 +8,10 @@ dependencies remain unchanged:
 
 ```sh
 python3 -m venv /tmp/ez-penta-report-env
-/tmp/ez-penta-report-env/bin/python -m pip install -r reports/20261105T134711Z/rendering-requirements.txt
-/tmp/ez-penta-report-env/bin/python -B reports/20261105T134711Z/collect_evidence.py
-/tmp/ez-penta-report-env/bin/python -B reports/20261105T134711Z/render_report.py
-/tmp/ez-penta-report-env/bin/python -B reports/20261105T134711Z/validate_report.py
+/tmp/ez-penta-report-env/bin/python -m pip install -r archive/reports/20261105T134711Z/rendering-requirements.txt
+/tmp/ez-penta-report-env/bin/python -B archive/reports/20261105T134711Z/collect_evidence.py
+/tmp/ez-penta-report-env/bin/python -B archive/reports/20261105T134711Z/render_report.py
+/tmp/ez-penta-report-env/bin/python -B archive/reports/20261105T134711Z/validate_report.py
 ```
 
 The renderer used macOS Arial TrueType fonts. A DejaVu Sans fallback is supported
@@ -27,3 +27,5 @@ The four case studies are targeted examples re-read from the SQLite answer table
 they are not a representative human accuracy study. Source IDs and languages in
 the report identify the original records. Actionable harmful passages were not
 reproduced in the report.
+
+Migration note: this historical bundle moved on 2026-11-16. Script repository-root detection and commands were adjusted; saved outputs/hashes remain historical snapshots. Historical source hashes may differ from the current working tree.

@@ -1,0 +1,21 @@
+{
+  "moves": [
+    {
+      "from": "marcus",
+      "to": "data_ready/dataset2_snapshot",
+      "sha256_by_file": {
+        "dataset2_high_coverage_incomplete.csv": "a598407ee953103a1ede83e6dbd070e92cd199a4f8ddc5b0ef8b4c9e1d1f97ab",
+        "dataset2_partial.sqlite3": "296be6962f573eac1133f099eac098a16318b3d708e1cc9e541ea6fb53eea21f"
+      }
+    },
+    {
+      "from": "review_ui",
+      "to": "eval/review_ui",
+      "sha256_by_file": {
+        "index.html": "a721d0bc73f0610e7c53b920c08bbd4398b8b78d8932f26e9dc7794d624288ba",
+        "style.css": "0d6f244d3adeef04345b3d15955a00911edd48d3eadfe163f3dbdfe4e8dcb234",
+        "app.js": "7307d1a2c6ad6ab7bcfc0dac9d7db26674ccacfc108412987f0a6191e7965392"
+      }
+    }
+  ]
+}
