@@ -13,7 +13,7 @@ import sys
 
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+ROOT = next(parent for parent in HERE.parents if (parent / "AGENTS.md").is_file())
 
 
 def sha(path):
@@ -41,11 +41,11 @@ def exact_binomial(b, c):
 def main():
     inputs = [ROOT / name for name in ("eval_aya_answers.jsonl", "eval_scores.jsonl", "answercarefully_eval.sqlite3")]
     source_paths = [ROOT / name for name in git("ls-files").splitlines()]
-    source_paths += [ROOT / "inspect_evaluation.py", ROOT / "tests/test_inspect_evaluation.py"]
+    source_paths += [ROOT / "eval/inspect_evaluation.py", ROOT / "tests/test_inspect_evaluation.py"]
     source_before = {str(path.relative_to(ROOT)): sha(path) for path in source_paths if path.is_file()}
     input_before = {path.name: {"bytes": path.stat().st_size, "sha256": sha(path)} for path in inputs}
 
-    spec = importlib.util.spec_from_file_location("existing_audit", ROOT / "inspect_evaluation.py")
+    spec = importlib.util.spec_from_file_location("existing_audit", ROOT / "eval/inspect_evaluation.py")
     audit = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(audit)
     stats, rows = audit.analyze(inputs[2], inputs[0], inputs[1])

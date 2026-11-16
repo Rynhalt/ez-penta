@@ -1,0 +1,28 @@
+{
+  "moves": [
+    {
+      "from": "answercarefully_dataset.py",
+      "to": "data_ready/answercarefully_dataset.py",
+      "sha256_before_path_repairs": "7e3e79be4522cff06a36997ba83d18a96335f89d807830dbb3d25cff082dc6d6",
+      "sha256_after_path_repairs": "7e3e79be4522cff06a36997ba83d18a96335f89d807830dbb3d25cff082dc6d6"
+    },
+    {
+      "from": "evaluate_answercarefully.py",
+      "to": "eval/evaluate_answercarefully.py",
+      "sha256_before_path_repairs": "3352942431d6a61f7e98e8a810868b500c0de15519880c8ecf905475109eea79",
+      "sha256_after_path_repairs": "e118b7bd0a2c86a3a760638482ba54dbd5143df10965b29dc7b8ca45b03845a3"
+    },
+    {
+      "from": "inspect_evaluation.py",
+      "to": "eval/inspect_evaluation.py",
+      "sha256_before_path_repairs": "5b973609b42d500788220b06bb06b67099720264ae3f425be16ab72caed59c8d",
+      "sha256_after_path_repairs": "5b973609b42d500788220b06bb06b67099720264ae3f425be16ab72caed59c8d"
+    },
+    {
+      "from": "review_results.py",
+      "to": "eval/review_results.py",
+      "sha256_before_path_repairs": "7adc00d3e64e5b7eb73654b198be44987f438988ef6ffd4a794892b8b1be8d0c",
+      "sha256_after_path_repairs": "e88e1fe278a03fa11912a5c9d6f4641ac80396e6f9afd6dc728914a502e384bc"
+    }
+  ]
+}

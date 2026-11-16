@@ -1,0 +1,11 @@
+outcome,population,arm,delta_pp,ci_low_pp,ci_high_pp,n,mcnemar_p
+refused,Harmless twins · English,L18 removal,-22.435897435897434,-29.801633005635313,-15.430911680911684,156,5.820766091346741e-11
+refused,Harmless twins · English,L8 removal,0.0,-1.89873417721519,1.8867924528301887,156,1.0
+refused,Harmless twins · English,D1 − random (EN),-15.873015873015872,-19.676284414945922,-12.299879249978913,441,
+refused,Harmless twins · Japanese,L18 removal,-10.897435897435898,-17.36121506986028,-5.094735144723055,156,7.62939453125e-05
+refused,Harmless twins · Japanese,L8 removal,0.0,-1.9230769230769231,1.8636451863354022,156,1.0
+unsafe_su,Harmful prompts · English,L18 removal,3.749999999999999,0.9344707672245163,6.727072335433575,240,0.01171875
+unsafe_su,Harmful prompts · English,L8 removal,0.0,0.0,0.0,239,1.0
+unsafe_su,Harmful prompts · English,D4 − random (EN),4.184100418410042,1.2982850482850483,7.489262114537443,239,
+unsafe_su,Harmful prompts · Japanese,L18 removal,5.833333333333332,3.418439716312057,8.67579908675799,240,0.0001220703125
+unsafe_su,Harmful prompts · Japanese,L8 removal,1.2295081967213115,0.0,2.7453682260305685,244,0.25

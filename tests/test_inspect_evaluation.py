@@ -2,7 +2,7 @@
 
 import unittest
 
-from inspect_evaluation import mcnemar, numeric_equal, paired_counts, rate
+from eval.inspect_evaluation import mcnemar, numeric_equal, paired_counts, rate
 
 
 class EvaluationAuditTests(unittest.TestCase):

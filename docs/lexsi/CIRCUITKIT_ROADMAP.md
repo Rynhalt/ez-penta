@@ -537,3 +537,63 @@ Interpretation: this is a selected proxy-agreement audit, not a random validatio
 - [x] Added aggregate-only audit and tests (2/2 pass); report `outputs/lexsi/answercarefully_snapshot_audit_20261112.json`.
 - The source offers 1,067 dev and 245 test items with adaptation tag 0, but no English reference answers and no explicit refusal-required labels. It is a candidate source for bilingual-reviewed development examples, not a ready-made roleplay/refusal circuit set.
 - [ ] Resolve prior Tiny Aya exposure of the 336-row test split before using it as a fresh evaluation set. The local Aya evaluation notebook has no saved execution, but historical external outputs are unavailable/unresolved. Keep the test split sealed in the meantime and respect the source's no-redistribution terms.
+
+### 2026-11-12 — Owner-requested UK cultural extension
+
+- [x] Added `data_ready/generate_dataset2_uk.ipynb`, reusing existing Dataset2 neutral seeds/twins and the existing rewrite batching/checkpoint helper. Original seed IDs, splits and neutral prompts remain intact. UK strategy definitions are extracted from `dataset2v2.ipynb` by a reproducible notebook builder.
+- [x] Added a companion `eval/eval_dataset2_uk.ipynb` using the existing GGUF backend, AuditKIT scorer and observation exports. UK-versus-neutral analysis uses the same matched-comparison implementation. Original shard validation defaults remain unchanged; extension loading explicitly opts into a different count and culture list.
+- [x] Kept generator outputs under `dataset2_uk/` (five-seed default under `pilot/`); incomplete output and provisional review states stay explicit. No historical data, labels or model outputs are overwritten.
+- [ ] Execute and inspect the five-seed Qwen pilot on a real Colab GPU. Local structural tests are not GPU execution evidence.
+- [ ] Review UK cultural and bilingual task equivalence, then extend the run as appropriate. Reusing old seeds does not provide fresh heldout examples for CircuitKIT.
+- Decision: this is a cultural extension of existing Dataset2, not a new independent-seed cohort or a human-approved mechanistic dataset. All existing CircuitKIT review/metric/causal gates remain applicable. Run instructions: `data_ready/DATASET2_UK.md`.
+- Verification: 12 local tests passed (4 UK extension tests, 4 original Dataset2 validation tests, 4 shared analysis regression tests). Both notebook code cells parse and embedded helper snapshots match the source files. The real source loader selected five analysis seeds, 116 neutral prompts and 10 existing bilingual harmful/twin requests. No Qwen generation or Colab GPU execution is claimed.
+
+### UK extension default updated at owner request
+
+- The generator now defaults to the full existing seed set (`SEED_LIMIT = None`), and the companion evaluator defaults to `COHORT = 'full'`. The optional analysis-only pilot remains available but is not a prerequisite. Full outputs go to `MyDrive/ez-penta/dataset2_uk/`. This settings change does not launch GPU inference.
+
+### 2026-11-13 — UK evaluator aligned to teammate HF/PEFT notebooks
+
+- [x] Inspected `/Users/marcuschang/Downloads/eval_baseline.ipynb` and `eval_restricted.ipynb`: HF Tiny Aya, trained adapter folders/ZIP, PEFT merge, greedy 512-token answers, HF Qwen3Guard with 64-token verdicts.
+- [x] Replaced the UK GGUF-only evaluator with original HF baseline plus saved restricted adapter evaluation by default; broad is optional. UK+neutral prompts are identical across model arms. Shared Dataset2 journals, raw guard records and exports are reused.
+- [x] Record adapter weight/config hashes, resolved model revisions, dependency freeze, GPU settings/resources, explicit failures, and per-model results on Drive. Save compatibility answer views and paired before/after results with seed bootstrap intervals.
+- Decision: preserve full prompt input; do not copy the reference notebooks' silent 1,024-token truncation. Use one model at a time, batch size one, and fp16 on T4/bf16 on supported hardware. Cap-hit answers are tracked as truncated rather than judged as completed. Prompt-safety scoring remains a separate supplementary measurement.
+- [ ] Execute the revised notebook on a real Colab GPU with the saved adapters; local CPU checks cannot establish checkpoint usability or improvement. Verify the resolved base revision against the actual training revision where available.
+- Local verification: eight distinct CPU tests passed in the project Python 3.12 environment (five UK HF/adapter/comparison/token-cap checks and three existing AuditKIT guard checks). Notebook code parses and embedded helper snapshots match current files. Initial guard tests used system Python without AuditKIT; rerunning in `.venv` resolved that environment failure. This does not validate real adapter weights or GPU execution.
+
+### Article synthesis checkpoint — 2026-11-16
+
+- [x] Update `reports/experiment_report.md` with the supplied abstract, verified pooled bilingual metrics, six embedded result figures, and a claim/source audit.
+- [x] Regenerate the six existing figure pairs from saved aggregate results and verify the report’s plotted claims and figure references.
+- [x] Keep CircuitKIT research gates unchanged: behavioral training/steering results are not EAP-IG discovery or causal circuit evidence.
+- [ ] Recover and independently reproduce the B5 refusal-decomposition notebook/results before making quantitative claims from it.
+- [x] Recover XSTEER A, B and D reports/results from Drive; B and D are summarized with limitations in the article. XSTEER C remains pending and is excluded until finalized.
+- [ ] Mirror the Drive-only `post_train_1/` and `post_train_2/` source notebooks/configurations into the public repository only after provenance, path and content-safety review.
+
+### Article and provenance revision — 2026-11-16
+
+- [x] Clarify article and abstract roles for SafeTune, CuratorKIT, AuditKit/Qwen3Guard and CircuitKIT; do not attribute direct Qwen3Guard BI/XSTEER runs to AuditKit.
+- [x] Add the completed XSTEER B all-36-layer, four-model diagnostic to the article evidence map. The result does not pass CircuitKIT discovery or causal-circuit gates.
+- [x] State that XSTEER C is unfinished and not included as a completed result.
+- [x] Add a non-destructive GitHub reorganization plan. No artifact moves/deletions or CircuitKIT exports were performed.
+- [ ] Keep the existing human approval, data alignment and metric-validity gates unchanged before exporting CircuitKIT inputs or claiming a Tiny Aya circuit result.
+- [ ] Recover/validate B5 row-level decomposition and XSTEER C finalized outputs before adding them as completed findings.
+
+### Repository archival/navigation phase — 2026-11-16
+
+- [x] Add repository entry-point indexes and preserve source/notebook paths.
+- [x] Archive the superseded report, completed local evaluation bundles and session notes under root `archive/`; record original paths and hashes in the migration manifest.
+- [x] Update historical reproduction commands and repository-root detection. Preserve private-artifact ignore rules.
+- CircuitKIT export approval and scientific evidence gates are unchanged; archival does not approve inputs or establish model findings.
+
+- Repository cleanup follow-up: relocate the original Dataset2 snapshot to `data_ready/dataset2_snapshot/` and review assets to `eval/review_ui/`; update consumers and regenerate Colab bundles. Preserve file contents and approval gates.
+
+- [x] Relocate AnswerCarefully root implementations into data/evaluation namespaces, update consumers and verify dataset/runner/inspection/review/launcher/notebook behavior (27 tests passed). No input export or model inference performed.
+
+### Article-driven archive implementation — 2026-11-16
+
+- [x] Inventory the non-environment worktree and record per-file keep/dependency/archive/review decisions in `docs/REPOSITORY_FILE_INVENTORY.csv`. Content-inspection coverage is explicit.
+- [x] Integrate historical material into root `_archive/` with per-file paths, reasons and verification methods; preserve all scientific evidence and gates.
+- [x] Replace root README with article/experiment navigation and retain original workflow README in the archive.
+- [x] Preserve uncertain notebooks/recovery scripts and directly referenced JA analysis/evaluation inputs; do not label unfinished CircuitKIT notebooks completed experiments.
+- Validation details and remaining public-release gaps are in `docs/ARCHIVE_AUDIT.md`. No Drive/HF cleanup, model inference or CircuitKIT input export performed.

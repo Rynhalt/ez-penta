@@ -1,0 +1,68 @@
+{
+ "created_utc": "2026-11-16T06:48:04Z",
+ "experiment": "x_steer D",
+ "agent": "agent1",
+ "hardware": "G4",
+ "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+ "dtype": "bfloat16",
+ "gpu_versions": {
+  "torch": "2.14.0+cu130",
+  "vllm": "0.33.0",
+  "transformers": "5.20.2",
+  "peft": "0.21.2",
+  "python": "3.13.16"
+ },
+ "analysis_versions": {
+  "python": "3.14.7",
+  "numpy": "2.5.4",
+  "pandas": "3.1.1"
+ },
+ "decoding": "HF generate, greedy, max_new_tokens=256 in every arm, left padding, batch 64",
+ "max_new_tokens_all_arms": 256,
+ "judge": "Qwen/Qwen3Guard-Gen-0.6B",
+ "arms": {
+  "D0": 1381,
+  "D1_L8": 441,
+  "D2_L8": 442,
+  "D4_L8": 498,
+  "D5_L8": 690,
+  "D1_L18": 441,
+  "D2_L18": 442,
+  "D4_L18": 498,
+  "D5_L18": 690,
+  "D3_L8": 275,
+  "D3_L18": 275
+ },
+ "layers": [
+  8,
+  18
+ ],
+ "L_A": 8,
+ "files": {
+  "answers.jsonl": {
+   "bytes": 4667797,
+   "sha256": "2fe1043e809764c342eaa829bf74a04a522aaeeeb5301e515e2f7b479b505a95",
+   "rows": 6073
+  },
+  "judge.jsonl": {
+   "bytes": 1393041,
+   "sha256": "376bda7aad454fe158a1860209efe5f6411764d03f8a515d64ff3b2ea07ff483",
+   "rows": 6073
+  },
+  "gpu_manifest.json": {
+   "bytes": 1535,
+   "sha256": "34ac1983cf79d465e82656ad63d4f3c2a2ac85bb37792c9fc7c829abe069bbc3",
+   "rows": null
+  },
+  "results.json": {
+   "bytes": 21364,
+   "sha256": "95288fedbaf713ba0626d097bd69f14f0f8fa95ac96330816456fef70d6e54b3",
+   "rows": null
+  },
+  "report.md": {
+   "bytes": 3890,
+   "sha256": "5d39df3a13f038fe2b9f0afd4bc9da09349dc5702ef130164ddf3f44467d6005",
+   "rows": null
+  }
+ }
+}

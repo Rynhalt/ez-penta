@@ -474,7 +474,7 @@ class BuildAndEnvironmentTests(unittest.TestCase):
                 merge(
                     *dirs,
                     Path(tmp) / "out",
-                    dataset=root / "marcus/dataset2_partial.sqlite3",
+                    dataset=root / "data_ready/dataset2_snapshot/dataset2_partial.sqlite3",
                     manifest=manifest,
                 )
 

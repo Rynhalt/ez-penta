@@ -172,7 +172,8 @@ def matched_observations(table):
         ("rewrite_vs_control", "framing", f, "control") for f in ["rp", "fc", "rs"]
     ]
     definitions += [
-        ("culture_vs_neutral", "culture", c, "neutral") for c in ["japan", "us"]
+        ("culture_vs_neutral", "culture", c, "neutral")
+        for c in sorted(set(table.culture.dropna()) - {"neutral"})
     ]
     definitions += [("original_vs_twin", "kind", "harmful", "twin")]
     for name, dimension, a, b in definitions:
@@ -286,7 +287,9 @@ def export_bundle(directory, table, answers, scores, metadata):
     for cohort, subset in [
         ("all_retained", table),
         ("nonidentical_twins", table[table.analysis_eligible]),
-        ("complete_seeds", table[table.seed_id.isin(counts[counts == 84].index)]),
+        ("complete_seeds", table[table.seed_id.isin(
+            counts[counts == metadata.get("expected_prompts_per_seed", 84)].index
+        )]),
     ]:
         if len(subset):
             sensitivity.append(summarize(subset, ["split"]).assign(cohort=cohort))

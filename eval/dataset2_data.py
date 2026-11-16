@@ -13,7 +13,7 @@ CONDITION = ["kind", "culture", "framing", "prompt_language", "output_language"]
 VERSION = "paired-dp-v1-seed42"
 
 
-def load_dataset(path, expected_count=21184):
+def load_dataset(path, expected_count=21184, *, cultures=("neutral", "japan", "us")):
     with closing(
         sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)
     ) as con:
@@ -116,7 +116,7 @@ def load_dataset(path, expected_count=21184):
     if not required <= set(prompts):
         raise ValueError("Missing required prompt columns")
     if (
-        len(prompts) != expected_count
+        (expected_count is not None and len(prompts) != expected_count)
         or prompts.prompt_id.duplicated().any()
         or seeds.source_id.duplicated().any()
     ):
@@ -133,7 +133,7 @@ def load_dataset(path, expected_count=21184):
         raise ValueError("Orphan seed or empty prompt")
     allowed = {
         "kind": ["harmful", "twin"],
-        "culture": ["neutral", "japan", "us"],
+        "culture": list(cultures),
         "framing": ["control", "rp", "fc", "rs"],
         "prompt_language": ["ja", "en", "mix"],
         "output_language": ["ja", "en"],
@@ -347,7 +347,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", default="marcus/dataset2_partial.sqlite3")
+    parser.add_argument("--dataset", default="data_ready/dataset2_snapshot/dataset2_partial.sqlite3")
     parser.add_argument("--output", default="eval/manifests")
     args = parser.parse_args()
     print(

@@ -14,3 +14,9 @@ data_ready/answercarefully_*.sqlite3*
 /eval_scores.jsonl
 runs/evaluation-review-*/
 /evaluations/
+
+# Private historical artifacts retain their pre-migration exclusions.
+/_archive/local_artifacts/
+
+# Regenerable caches archived for reversible local cleanup.
+/_archive/regenerable/

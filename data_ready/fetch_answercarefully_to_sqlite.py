@@ -1,6 +1,6 @@
 """Freeze AnswerCarefully into a local SQLite database, so later runs don't need Hugging Face.
 
-Downloads the same way answercarefully_dataset.py does (pinned revision, saved HF login),
+Downloads the same way data_ready/answercarefully_dataset.py does (pinned revision, saved HF login),
 then writes every row into data_ready/answercarefully.sqlite3 (or --db-path).
 
 Usage:
@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from answercarefully_dataset import DATASET_CONFIGURATION, DATASET_ID, load_answercarefully_data
+from data_ready.answercarefully_dataset import DATASET_CONFIGURATION, DATASET_ID, load_answercarefully_data
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "answercarefully.sqlite3"
 

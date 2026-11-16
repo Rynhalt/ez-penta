@@ -413,7 +413,7 @@ class GuardTransport:
         return result
 
 
-def make_judge(runner):
+def make_judge(runner, max_tokens=128):
     import auditkit as ak
     from eval.scoring import guard_messages
     from guard_judge import parse_guard
@@ -430,7 +430,7 @@ def make_judge(runner):
             judge_model=transport,
             assess=assess,
             name="guard_" + assess,
-            max_tokens=128,
+            max_tokens=max_tokens,
         )
         for assess in ["response", "prompt"]
     ]

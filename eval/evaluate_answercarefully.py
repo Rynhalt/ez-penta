@@ -10,7 +10,7 @@ from pathlib import Path
 
 import auditkit as ak
 
-from answercarefully_dataset import load_answercarefully_data, select_samples
+from data_ready.answercarefully_dataset import load_answercarefully_data, select_samples
 import chat
 from guard_judge import GUARD_MODEL, make_guard
 from huggingface_auth import preserve_login_location
