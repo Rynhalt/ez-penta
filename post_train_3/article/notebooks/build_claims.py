@@ -22,7 +22,7 @@ claims = [
  ("num", "Japanese-only Unsafe, Japanese prompts", ["ja_contrasts", "safety|ja-en|ja", "rate_A_pct"], 8.33, 2, "8.33% (696/8,359)", "bilingual/results.json secondary"),
  ("num", "English-only Unsafe, Japanese prompts", ["ja_contrasts", "safety|ja-en|ja", "rate_B_pct"], 15.68, 2, "15.68% (1,297/8,273)", "bilingual/results.json secondary"),
  ("num", "Bilingual Unsafe, Japanese prompts", ["ja_contrasts", "safety|bi-ja|ja", "rate_A_pct"], 9.68, 2, "9.68% (809/8,360)", "bilingual/results.json secondary"),
- ("num", "English ×2 Unsafe, Japanese prompts", ["ja_contrasts", "safety|en2-en|ja", "rate_A_pct"], 17.11, 2, "17.11% (1,412/8,253)", "bilingual/results.json secondary"),
+ ("num", "English ×2 Unsafe, Japanese prompts", ["ja_contrasts", "safety|en2-en|ja", "rate_A_pct"], 17.11, 2, "17.11% Unsafe (1,412/8,253", "bilingual/results.json secondary"),
  ("num", "Base Unsafe, Japanese prompts", ["vs_base", "safety|ja|ja", "rate_B_pct"], 15.37, 2, "15.37% (414/2,694)", "bilingual/results.json secondary"),
  ("num", "Japanese-only over-refusal, Japanese prompts", ["ja_contrasts", "over_refusal|ja-en|ja", "rate_A_pct"], 17.12, 2, "17.12% (976/5,700)", "bilingual/results.json secondary"),
  ("num", "Bilingual over-refusal, Japanese prompts", ["ja_contrasts", "over_refusal|bi-ja|ja", "rate_A_pct"], 15.35, 2, "15.35% (875/5,700)", "bilingual/results.json secondary"),
@@ -39,7 +39,7 @@ claims = [
  # English transfer (4.2)
  ("num", "en − base Unsafe, English prompts", ["vs_base", "safety|en|en", "estimate_pp"], -4.34, 2, "lowered English Unsafe by 4.34 pp", "bilingual/results.json secondary"),
  ("num", "en − base Unsafe, Japanese prompts", ["vs_base", "safety|en|ja", "estimate_pp"], 0.31, 2, "+0.31 pp, CI −1.04 to\n+1.66", "bilingual/results.json secondary"),
- ("num", "en2 − base Unsafe, Japanese prompts", ["vs_base", "safety|en2|ja", "estimate_pp"], 1.74, 2, "+1.74 pp from base (CI +0.40 to +3.09)", "bilingual/results.json secondary"),
+ ("num", "en2 − base Unsafe, Japanese prompts", ["vs_base", "safety|en2|ja", "estimate_pp"], 1.74, 2, "+1.74 pp, CI +0.40 to +3.09", "bilingual/results.json secondary"),
  # Primary hypotheses (4.3)
  ("num", "H1 bi − en, English (0.6B)", ["primary", "H1|safety|bi-en|en", "g06", "estimate_pp"], -2.75, 2, "−2.75 (−3.56 to −1.95)", "bilingual/results.json primary_g06"),
  ("num", "H1 bi − en, Japanese (0.6B)", ["primary", "H1|safety|bi-en|ja", "g06", "estimate_pp"], -6.0, 2, "−6.00 (−7.38 to −4.65)", "bilingual/results.json primary_g06"),
@@ -85,8 +85,8 @@ claims = [
  ("num", "x_steer C over-refusal, English", ["interventions_en", "Harm-independent direction, layer 1 (x_steer C)", "over_refusal_pp"], 0.72, 2, "+0.72 (−1.09 to +2.72)", "x_steer/C/results.json tests"),
  # Text-sourced claims (reports)
  ("src", "x_steer A: cos(f_pooled_old, g) = 0.60 at L18", None, None, None, "cosine 0.60", "post_train_3/x_steer/A/report.md", "at the steering layer L18 cos(f, g) = 0.60"),
- ("src", "x_steer A: f_bal vs h 0.78 at L18", None, None, None, "cosine 0.73–0.78 at layer 18", "post_train_3/x_steer/A/report.md", "| en_s0 | **f_bal vs h** | +0.28 | +0.47 | +0.74 | +0.78 |"),
- ("src", "x_steer B: no layer qualifies", None, None, None, "no layer was both readable", "post_train_3/x_steer/B/RESULTS.md", "no layer qualifies at any of the 36 layers"),
+ ("src", "x_steer A: f_bal vs h 0.78 at L18", None, None, None, "cosine 0.78 at layer 18", "post_train_3/x_steer/A/report.md", "| en_s0 | **f_bal vs h** | +0.28 | +0.47 | +0.74 | +0.78 |"),
+ ("src", "x_steer B: no layer qualifies", None, None, None, "No layer, model or language met our separability rule", "post_train_3/x_steer/B/RESULTS.md", "no layer qualifies at any of the 36 layers"),
  ("src", "x_steer B: ja_s0 English twin refusals 99 → 285", None, None, None, "(99 → 285 of 975)", "post_train_3/x_steer/B/RESULTS.md", "99 → 285 refused English twins"),
  ("src", "Steering quality check", None, None, None, "118 edited wins, 104 unedited, 178 ties", "post_train_3/steering/report.md", "edited wins 118, unedited wins 104, ties 178"),
  ("src", "CAST on base, Unsafe", None, None, None, "10.0% (131/1,314) to 6.8% (90/1,332)", "post_train_3/steering/report.md", "131/1314 (10.0%) | 90/1332 (6.8%)"),

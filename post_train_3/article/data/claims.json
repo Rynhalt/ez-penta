@@ -177,7 +177,7 @@
   ],
   "value": 17.11,
   "dp": 2,
-  "text": "17.11% (1,412/8,253)",
+  "text": "17.11% Unsafe (1,412/8,253",
   "source": "bilingual/results.json secondary",
   "pattern": null
  },
@@ -387,7 +387,7 @@
   ],
   "value": 1.74,
   "dp": 2,
-  "text": "+1.74 pp from base (CI +0.40 to +3.09)",
+  "text": "+1.74 pp, CI +0.40 to +3.09",
   "source": "bilingual/results.json secondary",
   "pattern": null
  },
@@ -947,7 +947,7 @@
   "path": null,
   "value": null,
   "dp": null,
-  "text": "cosine 0.73–0.78 at layer 18",
+  "text": "cosine 0.78 at layer 18",
   "source": "post_train_3/x_steer/A/report.md",
   "pattern": "| en_s0 | **f_bal vs h** | +0.28 | +0.47 | +0.74 | +0.78 |"
  },
@@ -957,7 +957,7 @@
   "path": null,
   "value": null,
   "dp": null,
-  "text": "no layer was both readable",
+  "text": "No layer, model or language met our separability rule",
   "source": "post_train_3/x_steer/B/RESULTS.md",
   "pattern": "no layer qualifies at any of the 36 layers"
  },

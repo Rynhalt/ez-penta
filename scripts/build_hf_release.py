@@ -82,6 +82,10 @@ def check_done(folder: Path) -> None:
         raise SystemExit(f"DONE does not match manifest.json: {folder}")
 
 
+def bplan_first(src: Path) -> dict:
+    return json.loads((src / "bilingual/plan.json").read_text())["eval"]["first_batch_of_seed"]
+
+
 def js(v) -> str:
     """Nested values are stored as JSON strings so the parquet schema stays flat and stable."""
     return json.dumps(v, ensure_ascii=False, sort_keys=True)
@@ -195,8 +199,8 @@ def build_prompts(src: Path, out: Path) -> Release:
             rejects.append({"batch": int(b.name[1:]), "key": str(r.get("key")), "stage": str(r.get("stage")),
                             "attempt": r.get("attempt"), "reason": str(r.get("reason")), "raw": js(r.get("raw"))})
     seeds_df = pd.DataFrame(seeds)
+    first = bplan_first(src)
     # seed_id is reused by 7 seeds across batches with different text; the eval uses the batch it first appears in.
-    first = bplan["eval"]["first_batch_of_seed"]
     seeds_df["in_bilingual_eval"] = [int(first.get(s, -1)) == int(b) for s, b in zip(seeds_df.seed_id, seeds_df.batch)]
     rel.check(len(seeds_df) == 600, "pool_seeds: 6 frozen batches x 100 generated seeds = 600 rows")
     rel.check(seeds_df.in_bilingual_eval.sum() == bplan["eval"]["n_eval_seeds"] == 519,
@@ -464,16 +468,18 @@ size_categories: [1K<n<10K]
 
 Training data for the LoRA adapters in *"Safer, or Just More Refusals? English, Japanese and Bilingual Safety
 Fine-Tuning of Tiny Aya"*. 568 aligned items (284 refusal targets for harmful prompts, 284 helpful targets for
-harmless twins) are presented in different languages and orders:
+harmless twins) are presented in different languages and orders. Adapters:
+[`{NAMESPACE}/{REPO_MODELS}`](https://huggingface.co/{NAMESPACE}/{REPO_MODELS}); answers and judge labels:
+[`{NAMESPACE}/{REPO_RESULTS}`](https://huggingface.co/datasets/{NAMESPACE}/{REPO_RESULTS}).
 
 | Condition | Rows (steps) | Stream |
 |---|---:|---|
 | `en` | 568 | English row per item |
 | `ja` | 568 | Japanese row per item |
 | `bi` | 1,136 | English row then Japanese row per item |
-| `en2` | 1,136 | English row twice per item (dose control for `bi`) |
+| `en2` | 1,136 | English row twice per item (training-length control for `bi`, Section 8.2) |
 | `bi_h2` | 1,704 | `bi`, with helpful items shown twice (follow-up E2) |
-| `ja2` | 1,136 | Japanese row twice (follow-up) |
+| `ja2` | 1,136 | Japanese row twice (follow-up E3, Section 8.3) |
 | `en_A`, `ja_A`, `en_B`, `ja_B` | 333 / 235 | Item halves A and B (follow-up E3) |
 
 Each main condition was trained with 3 seeds (0, 1, 2). An **item** is an aligned prompt/target example; a **row**
@@ -544,7 +550,6 @@ def rates(df: pd.DataFrame, judge: str = "g06") -> tuple[str, str]:
 def build_results(src: Path, out: Path) -> Release:
     rel = Release(REPO_RESULTS, src, out)
     bplan = json.loads(rel.source(src / "bilingual/plan.json").read_text())
-    first = bplan["eval"]["first_batch_of_seed"]
     ok_bi = set(bplan["eval"]["paired_ok_seeds"])
     nums = json.loads((ARTICLE_DIR / "data/numbers.json").read_text())
 
@@ -565,52 +570,39 @@ def build_results(src: Path, out: Path) -> Release:
         miss = int(df.prompt.isna().sum())
         rel.check(miss == 0, f"{config}: every row joined to its prompt text")
         if expect is not None:
-            rel.check(len(df) == expect, f"{config}: {expect:,} rows")
+            rel.check(len(df) == expect, f"{config}: {expect:,} rows (found {len(df):,})")
         rel.add(config, df)
         return df
 
     # ---------- 1. bilingual (Sections 4-5): base, en, ja, bi, en2 x 3 training runs, 12,426 prompts each
-    cwd = Path.cwd()
+    # Run the article's own loader (B4_analysis, up to MODELS) so the published rows are exactly the analysed rows.
+    # One change: `take` keeps the whole row instead of the analysis columns; selection logic is untouched.
     import os
+    cwd = Path.cwd()
     os.chdir(REPO_ROOT / "post_train_3/bilingual/notebooks")
     srcb4 = Path("nbsrc/B4_analysis.py").read_text()
+    head = srcb4[:srcb4.index("MODELS = sorted(ROWS)")]
+    keep = "{k: r[k] for k in KEEP}"
+    rel.check(head.count(keep) == 1 and head.count("N_BOOT = 10000") == 1, "bilingual: analysis loader found unchanged")
     g: dict = {}
-    exec(compile(srcb4[:srcb4.index("MODELS = sorted(ROWS)")].replace("N_BOOT = 10000", "N_BOOT = 0"), "B4_analysis_head", "exec"), g)
+    for full in (False, True):
+        code = head.replace("N_BOOT = 10000", "N_BOOT = 0")
+        if full:
+            code = code.replace(keep, "dict(r)")
+        gg: dict = {}
+        exec(compile(code, "B4_analysis_head", "exec"), gg)
+        g[full] = gg
     os.chdir(cwd)
-    ROWS = g["ROWS"]
-    cands: dict = collections.defaultdict(dict)
-
-    def put(m, r, path):
-        cands[m].setdefault(r["prompt_id"], (r, path))
-    for r in load_jsonl(rel.source(src / "bilingual/eval/base_us/eval.jsonl")):
-        put("base", r, "bilingual/eval/base_us")
-    for c in sorted((src / "japan_culture/chunks").iterdir()):
-        for m in ("base", "en_s0"):
-            for r in load_jsonl(rel.source(c / m / "eval.jsonl")):
-                if r["culture"] == "japan":
-                    put(m, r, f"japan_culture/chunks/{c.name}/{m}")
-    for f in sorted((src / "arm_en/eval").glob("b*.jsonl")):
-        for r in load_jsonl(rel.source(f)):
-            if r["model"] in ("en_s0", "en_s1", "en_s2") and int(first.get(r["seed_id"], -1)) == int(r["batch"]):
-                put(r["model"], r, f"arm_en/eval/{f.name}")
-    for k in (1, 2):
-        for r in load_jsonl(rel.source(src / f"bilingual/eval/en_s{k}_jp/eval.jsonl")):
-            put(f"en_s{k}", r, f"bilingual/eval/en_s{k}_jp")
-    for cond in ("ja", "bi", "en2"):
-        for k in range(3):
-            d = src / f"bilingual/eval/{cond}_s{k}"
-            check_done(d)
-            for r in load_jsonl(rel.source(d / "eval.jsonl")):
-                put(f"{cond}_s{k}", r, f"bilingual/eval/{cond}_s{k}")
+    ROWS, FULL, SOURCES = g[False]["ROWS"], g[True]["ROWS"], g[True]["SOURCES"]
+    rel.check(not g[True]["FAKE_TEST"], "bilingual: loader not in test mode")
     rows, mism = [], 0
     for m, want in ROWS.items():
         for pid, ref in want.items():
-            r, path = cands[m][pid]
-            for k in ("g06_label", "g06_refused", "g4b_label", "g4b_refused", "finish_reason"):
-                if str(r.get(k)) != str(ref.get(k)):
-                    mism += 1
+            r = FULL[m][pid]
+            mism += any(r.get(k) != v for k, v in ref.items())
             cond, seed = ("base", None) if m == "base" else (m.rsplit("_s", 1)[0], int(m.rsplit("_s", 1)[1]))
-            rows.append(norm_row(r, model=m, condition=cond, train_seed=seed, file=path, paired_ok=r["seed_id"] in ok_bi))
+            rows.append(norm_row(r, model=m, condition=cond, train_seed=seed, file=SOURCES[m][r["culture"]],
+                                 paired_ok=r["seed_id"] in ok_bi))
     rel.check(mism == 0, "bilingual: every row's judge labels equal the analysis loader (B4_analysis) exactly")
     bi = finish("bilingual", rows, 13 * 12426)
     # release gate: reproduce the article's pooled rates per prompt language from the published rows
@@ -653,7 +645,10 @@ def build_results(src: Path, out: Path) -> Release:
     rows = [norm_row(r, model=r["model"], variant=r["variant"], run=js(r["run"]) if isinstance(r["run"], (dict, list)) else r["run"],
                      alpha=r.get("alpha"), gate=js(r.get("gate")) if isinstance(r.get("gate"), (dict, list)) else r.get("gate"), cos_h=r.get("cos_h"))
             for r in load_jsonl(rel.source(src / "steering/final_hf_base/answers.jsonl"))]
-    finish("steering_cast_base", rows, 11400)
+    cb = finish("steering_cast_base", rows, 11400)
+    got = [rates(cb[(cb.variant == v) & (cb.lang == "en")]) for v in ("none", "C")]
+    rel.check(got == [("131/1314", "42/950"), ("90/1332", "66/950")],
+              "CAST gate: English Unsafe 131/1,314 -> 90/1,332, over-refusal 42/950 -> 66/950 (Section 8.4)")
     q = pd.DataFrame(load_jsonl(rel.source(src / "steering/quality/pairs.jsonl")))
     for col in q.columns:
         q[col] = q[col].map(lambda v: js(v) if isinstance(v, (dict, list)) else v)
@@ -697,7 +692,7 @@ def build_results(src: Path, out: Path) -> Release:
             check_done(d / part)
             for r in load_jsonl(rel.source(d / part / "eval.jsonl")):
                 rows.append(norm_row(r, model=d.name.replace("A_", "A*"), experiment="E1"))
-    fu = finish("followups_half_pool", rows, 15 * 6598 + 3 * (3312 + 2940))
+    fu = finish("followups_half_pool", rows, 12 * 6598 + 3 * (3312 + 2940))
     sub = fu[(fu.model.str.startswith("bi_h2")) & (fu.culture == "us") & (fu.lang == "en")]
     k = sub.groupby("model").apply(lambda s: int(s[(s.kind == "twin") & s.framing.isin(["control", "fc"])].g06_refused.sum()))
     rel.check(abs(100 * k.sum() / (3 * 552) - nums["followups"]["E2|over_refusal|bi_h2-bi|us|en"]["rates_pct"]["bi_h2|us"]) < 0.01,
