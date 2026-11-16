@@ -247,6 +247,39 @@ plt.close(fig)
 print(sorted(p.name for p in FIG.glob("*.png")))
 '''
 
+XB3_A = '''# Compare with A (saved layers, base and en_s0) when A is DONE; B's values are used for decisions (section 3).
+AD = XS / "A"
+ACMP, A_STATUS = None, "A not DONE"
+if (AD / "DONE").exists() and (AD / "manifest.json").exists() and (AD / "DONE").read_text().strip() == sha256_file(AD / "manifest.json"):
+    A_STATUS = "A DONE"
+    a = pd.read_csv(AD / "diagnostics.csv")
+    rows = []
+    for r in a.itertuples():
+        k = f"{r.model}|L{int(r.layer)}"
+        if k not in J["diag"]:
+            continue
+        d = J["diag"][k]
+        for pop_a, pop_b in (("en", "en"), ("ja", "ja"), ("pooled", "all")):
+            for kind in ("ho", "in"):
+                va, vb = getattr(r, f"auc_{kind}_{pop_a}"), d.get(f"auc_{kind}_{r.direction}_{pop_b}")
+                if vb is not None and not pd.isna(va):
+                    rows.append({"model": r.model, "layer": int(r.layer), "direction": r.direction, "stat": f"auc_{kind}_{pop_b}", "A": va, "B": vb})
+        for ca, cb in (("cos_h", "h"), ("cos_h_en", "h_en"), ("cos_h_ja", "h_ja"), ("cos_g", "g")):
+            vb = d.get(f"cos_{r.direction}_{cb}")
+            if vb is not None and not pd.isna(getattr(r, ca)):
+                rows.append({"model": r.model, "layer": int(r.layer), "direction": r.direction, "stat": f"cos_{cb}", "A": getattr(r, ca), "B": vb})
+    ACMP = pd.DataFrame(rows)
+    ACMP["diff"] = ACMP.B - ACMP.A
+    ACMP["flag"] = np.where(ACMP.stat.str.startswith("auc"), ACMP["diff"].abs() > 0.03, ACMP["diff"].abs() > 0.05)
+    ACMP.to_csv(B / "compare_A.csv", index=False)
+    print(len(ACMP), "comparisons; flagged", int(ACMP.flag.sum()), "; max |diff| auc", ACMP[ACMP.stat.str.startswith("auc")]["diff"].abs().max(),
+          "cos", ACMP[ACMP.stat.str.startswith("cos")]["diff"].abs().max())
+    print(ACMP[ACMP.flag].head(30).to_string())
+    key = ACMP[(ACMP.model == "en_s0") & (ACMP.direction == "f_en_perp_hg") & (ACMP.stat == "auc_ho_en")]
+    print(key.to_string())
+print(A_STATUS)
+'''
+
 XB3_PUB = '''# report.md, results.json, manifest.json, DONE for PT3/x_steer/B.
 def fm(x, d=3):
     return "–" if x is None or (isinstance(x, float) and np.isnan(x)) else f"{x:.{d}f}"
@@ -301,6 +334,10 @@ Layers meeting both section-3 thresholds, per model × language: {PAR}
 {xct}
 max |Δcos(f,h)| = {XC.d_cos.abs().max():.4f}, max |ΔAUC f⊥| = {XC.d_auc_fperp.abs().max():.4f}; flagged (>0.05 cos or >0.03 AUC): {int(XC.flag.sum())}.
 
+## Comparison with A (saved layers; section 3: >0.03 AUC or >0.05 cos is logged, B is used)
+
+{A_STATUS}. {'' if ACMP is None else f'{len(ACMP)} comparisons (all directions, AUC held-out/in-sample and cosines); flagged {int(ACMP.flag.sum())}; max |ΔAUC| {ACMP[ACMP.stat.str.startswith(chr(97))][chr(100)+chr(105)+chr(102)+chr(102)].abs().max():.4f}, max |Δcos| {ACMP[ACMP.stat.str.startswith(chr(99))][chr(100)+chr(105)+chr(102)+chr(102)].abs().max():.4f}. Details: compare_A.csv.'}
+
 ## Files
 
 `b_all_layers/` (directions_all.npz, diagnostics.json/csv, cross_model.csv, manifest, DONE), `s1_labels_ja_s0/`, `qualifying_layers.json`,
@@ -311,7 +348,7 @@ res = {"L_star": LSTAR, "negative_control": qual["negative_control"], "qualifyin
        "train_language": TRAIN.to_dict(orient="records"), "threshold_layers": PAR, "crosscheck": XC.to_dict(orient="records"), "hardware": HW,
        "L_star_values": best}
 (B / "results.json").write_text(json.dumps(res, indent=1, default=float))
-files = ["report.md", "results.json", "qualifying_layers.json", "hypothesis_H_by_layer.csv", "crosscheck_steering.csv"] + \\
+files = ["report.md", "results.json", "qualifying_layers.json", "hypothesis_H_by_layer.csv", "crosscheck_steering.csv"] + (["compare_A.csv"] if ACMP is not None else []) + \\
         [f"figures/{p.name}" for p in sorted(FIG.glob("*.png"))] + [f"b_all_layers/{f}" for f in ("manifest.json", "DONE")] + \\
         [f"s1_labels_ja_s0/{f}" for f in ("manifest.json", "DONE")]
 man = {"created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "experiment": "B", "agent": "agent2", **HW,
@@ -324,7 +361,7 @@ man = {"created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "exper
 print(rep[:3000])
 '''
 
-nbf.write(nb([COMMON, XB3_LOAD, XB3_XCHECK, XB3_RULE, XB3_H, XB3_FIG, XB3_PUB], "XS_DIR = \"\"\n",
+nbf.write(nb([COMMON, XB3_LOAD, XB3_XCHECK, XB3_RULE, XB3_H, XB3_FIG, XB3_A, XB3_PUB], "XS_DIR = \"\"\n",
              "# XB3_report (local CPU): B report, saved-layer cross-check, section-3 rule"), HERE / "XB3_report.ipynb")
 print("wrote XB3_report.ipynb")
 

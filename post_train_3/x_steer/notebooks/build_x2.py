@@ -61,7 +61,11 @@ def nb(cells, params, title):
     return n
 
 
-GPU_COMMON = [HFTOKEN, HELPERS, ENV, TORCHAO, FREE_LLM, MERGE, STEER]
+F3 = json.loads((PT3R / "followups/notebooks/F3_eval.ipynb").read_text())
+_h = find(F3, "_load_llm_g4 = load_llm")
+L4SCALE = _h[_h.index("# FU deviation 4"):]
+L4SCALE = L4SCALE[:L4SCALE.index("return _load_llm_g4(model_id, dtype, u, *a, **kw)") + len("return _load_llm_g4(model_id, dtype, u, *a, **kw)")] + "\n"
+GPU_COMMON = [HFTOKEN, HELPERS + "\n\n" + L4SCALE, ENV, TORCHAO, FREE_LLM, MERGE, STEER]
 
 # ------------------------------------------------------------------ XB1: ja_s0 labels on the extraction twins
 XB1_MAIN = '''# XB1: answer the extraction set's harmless twins with ja_s0 (vLLM, greedy, 1024) and judge them with the 0.6B guard (S1 code).
