@@ -89,7 +89,7 @@ Bilingual training presents every item in both languages, so it takes twice as m
 
 ## 4. Training language decides where safety improves
 
-![Figure 1](figures/fig1_safety_vs_overrefusal.png)
+![Figure 1](fig1_safety_vs_overrefusal.png)
 
 *Figure 1. Unsafe answers to harmful prompts (x) against refused harmless prompts (y), by prompt language. Large markers pool three training runs; small dots are single runs; base has one run. Lower-left is better on both. English ×2 (grey diamond) is a training-length control described in Section 8.2.*
 
@@ -106,7 +106,7 @@ Bilingual training presents every item in both languages, so it takes twice as m
 
 Trained-condition counts sum three runs.
 
-![Figure 2](figures/fig2_change_from_base.png)
+![Figure 2](fig2_change_from_base.png)
 
 *Figure 2. Paired change from the base model on identical prompts, with two-level bootstrap 95% CIs (evaluation seeds × training runs). Filled circles: English prompts; open squares: Japanese prompts. English ×2 is described in Section 8.2.*
 
@@ -137,7 +137,7 @@ Its over-refusal was the highest of any condition: 25.7% (2,927/11,400) overall,
 
 The Unsafe rate can fall for two reasons: the model refuses more harmful prompts, or it answers them more safely. Writing P(Unsafe) = P(answered) × P(Unsafe | answered), we split each change from base into these two parts with a two-factor Shapley decomposition (mean of three runs; harmful prompts; 0.6B judge).
 
-![Figure 3](figures/fig3_refusal_decomposition.png)
+![Figure 3](fig3_refusal_decomposition.png)
 
 *Figure 3. Change in the Unsafe rate from base, split into the part from refusing more often (grey) and the part from answering more or less safely (purple). Diamonds: total change. English ×2 is a training-length control described in Section 8.2.*
 
@@ -199,7 +199,7 @@ The experiments below support or extend the main results but are outside the mai
 
 Dataset2 gives every request a **cultural framing**. The **US framing** places it in an American setting with cue words such as cowboy, Wild West, mafia or Hollywood. The **Japan framing** uses cues such as ninja (25% of Japan-framed English prompts), samurai (9%) or anime. Prompt language and cultural framing vary independently: an English prompt can carry a Japan cue. We included culture to tell apart two explanations for a safety failure: the *language* of the prompt, and *culture-specific words* that may themselves work as jailbreak cues.
 
-![Figure 4](figures/fig4_culture_vs_language.png)
+![Figure 4](fig4_culture_vs_language.png)
 
 *Figure 4. Left: base model Unsafe rate by cultural cue and prompt language (full pool). Right: matched-cue test E4 (150 seeds), paired differences with 95% CIs (0.6B) and the 4B estimate.*
 
@@ -238,7 +238,7 @@ Besides the weight edit in Section 6, we tested two more changes on the bilingua
 - x_steer C: removing the most harm-independent direction we found (layer 1) from the English adapter.
 - CAST: conditional activation steering at inference time on the base model (exploratory).
 
-![Figure 5](figures/fig5_interventions.png)
+![Figure 5](fig5_interventions.png)
 
 *Figure 5. Change in English over-refusal (x) and English Unsafe answers (y) for each intervention, against its own unedited model, with 95% CIs. Cohorts differ; compare directions, not sizes.*
 
