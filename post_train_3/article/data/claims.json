@@ -1,0 +1,1034 @@
+[
+ {
+  "kind": "num",
+  "claim": "Base Unsafe, all prompts",
+  "path": [
+   "pooled_all",
+   "base",
+   "unsafe_pct"
+  ],
+  "value": 13.29,
+  "dp": 2,
+  "text": "13.3% (702/5,282)",
+  "source": "bilingual/results.json headline_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Bilingual Unsafe, all prompts",
+  "path": [
+   "pooled_all",
+   "bi",
+   "unsafe_pct"
+  ],
+  "value": 6.85,
+  "dp": 2,
+  "text": "6.9%\n(1,147/16,743)",
+  "source": "bilingual/results.json headline_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Base over-refusal, all prompts",
+  "path": [
+   "pooled_all",
+   "base",
+   "over_refusal_pct"
+  ],
+  "value": 3.79,
+  "dp": 2,
+  "text": "3.8% (144/3,800)",
+  "source": "bilingual/results.json headline_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Bilingual over-refusal, all prompts",
+  "path": [
+   "pooled_all",
+   "bi",
+   "over_refusal_pct"
+  ],
+  "value": 25.68,
+  "dp": 2,
+  "text": "25.7% (2,927/11,400)",
+  "source": "bilingual/results.json headline_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Japanese-only Unsafe, English prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|ja-en|en",
+   "rate_A_pct"
+  ],
+  "value": 6.45,
+  "dp": 2,
+  "text": "6.45% (528/8,183)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "English-only Unsafe, English prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|ja-en|en",
+   "rate_B_pct"
+  ],
+  "value": 6.78,
+  "dp": 2,
+  "text": "6.78% (557/8,211)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Japanese-only over-refusal, English prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|ja-en|en",
+   "rate_A_pct"
+  ],
+  "value": 13.16,
+  "dp": 2,
+  "text": "13.16% (750/5,700)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "English-only over-refusal, English prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|ja-en|en",
+   "rate_B_pct"
+  ],
+  "value": 20.39,
+  "dp": 2,
+  "text": "20.39% (1,162/5,700)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Bilingual over-refusal, English prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|bi-ja|en",
+   "rate_A_pct"
+  ],
+  "value": 36.0,
+  "dp": 2,
+  "text": "36.00% (2,052/5,700)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Japanese-only Unsafe, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|ja-en|ja",
+   "rate_A_pct"
+  ],
+  "value": 8.33,
+  "dp": 2,
+  "text": "8.33% (696/8,359)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "English-only Unsafe, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|ja-en|ja",
+   "rate_B_pct"
+  ],
+  "value": 15.68,
+  "dp": 2,
+  "text": "15.68% (1,297/8,273)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Bilingual Unsafe, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|bi-ja|ja",
+   "rate_A_pct"
+  ],
+  "value": 9.68,
+  "dp": 2,
+  "text": "9.68% (809/8,360)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "English ×2 Unsafe, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|en2-en|ja",
+   "rate_A_pct"
+  ],
+  "value": 17.11,
+  "dp": 2,
+  "text": "17.11% (1,412/8,253)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Base Unsafe, Japanese prompts",
+  "path": [
+   "vs_base",
+   "safety|ja|ja",
+   "rate_B_pct"
+  ],
+  "value": 15.37,
+  "dp": 2,
+  "text": "15.37% (414/2,694)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Japanese-only over-refusal, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|ja-en|ja",
+   "rate_A_pct"
+  ],
+  "value": 17.12,
+  "dp": 2,
+  "text": "17.12% (976/5,700)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Bilingual over-refusal, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|bi-ja|ja",
+   "rate_A_pct"
+  ],
+  "value": 15.35,
+  "dp": 2,
+  "text": "15.35% (875/5,700)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "English-only over-refusal, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|ja-en|ja",
+   "rate_B_pct"
+  ],
+  "value": 6.39,
+  "dp": 2,
+  "text": "6.39% (364/5,700)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja − en Unsafe, English prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|ja-en|en",
+   "estimate_pp"
+  ],
+  "value": -0.33,
+  "dp": 2,
+  "text": "−0.33 pp, 95% CI −1.09 to +0.45",
+  "source": "bilingual/results.json secondary safety|ja-en|en",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja − en over-refusal, English prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|ja-en|en",
+   "estimate_pp"
+  ],
+  "value": -7.23,
+  "dp": 2,
+  "text": "7.2 pp fewer harmless English prompts (CI −8.7 to −5.8)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja − en fix rate, English prompts",
+  "path": [
+   "ja_contrasts",
+   "fix_rate|ja-en|en",
+   "estimate_pp"
+  ],
+  "value": -3.82,
+  "dp": 2,
+  "text": "67.0% vs 70.8%; −3.8 pp, CI −7.7 to +0.03",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja − base Unsafe, Japanese prompts",
+  "path": [
+   "vs_base",
+   "safety|ja|ja",
+   "estimate_pp"
+  ],
+  "value": -7.04,
+  "dp": 2,
+  "text": "−7.04 pp from base (CI −8.72 to −5.42)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja − en Unsafe, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|ja-en|ja",
+   "estimate_pp"
+  ],
+  "value": -7.35,
+  "dp": 2,
+  "text": "−7.35 pp versus English-only",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "bi − ja Unsafe, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "safety|bi-ja|ja",
+   "estimate_pp"
+  ],
+  "value": 1.35,
+  "dp": 2,
+  "text": "1.35 pp below bilingual (CI 0.47 to 2.29)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja − en fix rate, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "fix_rate|ja-en|ja",
+   "estimate_pp"
+  ],
+  "value": 30.22,
+  "dp": 2,
+  "text": "+30.2 pp, CI 25.4 to 35.0",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "bi − ja over-refusal, Japanese prompts",
+  "path": [
+   "ja_contrasts",
+   "over_refusal|bi-ja|ja",
+   "estimate_pp"
+  ],
+  "value": -1.77,
+  "dp": 2,
+  "text": "−1.77 pp, CI −2.86 to −0.72",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "en − base Unsafe, English prompts",
+  "path": [
+   "vs_base",
+   "safety|en|en",
+   "estimate_pp"
+  ],
+  "value": -4.34,
+  "dp": 2,
+  "text": "lowered English Unsafe by 4.34 pp",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "en − base Unsafe, Japanese prompts",
+  "path": [
+   "vs_base",
+   "safety|en|ja",
+   "estimate_pp"
+  ],
+  "value": 0.31,
+  "dp": 2,
+  "text": "+0.31 pp, CI −1.04 to\n+1.66",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "en2 − base Unsafe, Japanese prompts",
+  "path": [
+   "vs_base",
+   "safety|en2|ja",
+   "estimate_pp"
+  ],
+  "value": 1.74,
+  "dp": 2,
+  "text": "+1.74 pp from base (CI +0.40 to +3.09)",
+  "source": "bilingual/results.json secondary",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H1 bi − en, English (0.6B)",
+  "path": [
+   "primary",
+   "H1|safety|bi-en|en",
+   "g06",
+   "estimate_pp"
+  ],
+  "value": -2.75,
+  "dp": 2,
+  "text": "−2.75 (−3.56 to −1.95)",
+  "source": "bilingual/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H1 bi − en, Japanese (0.6B)",
+  "path": [
+   "primary",
+   "H1|safety|bi-en|ja",
+   "g06",
+   "estimate_pp"
+  ],
+  "value": -6.0,
+  "dp": 2,
+  "text": "−6.00 (−7.38 to −4.65)",
+  "source": "bilingual/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H3 bi − en2, English (0.6B)",
+  "path": [
+   "primary",
+   "H3|safety|bi-en2|en",
+   "g06",
+   "estimate_pp"
+  ],
+  "value": -0.63,
+  "dp": 2,
+  "text": "−0.63 (−1.26 to +0.02)",
+  "source": "bilingual/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H3 bi − en2, Japanese (0.6B)",
+  "path": [
+   "primary",
+   "H3|safety|bi-en2|ja",
+   "g06",
+   "estimate_pp"
+  ],
+  "value": -7.43,
+  "dp": 2,
+  "text": "−7.43 (−8.91 to −5.99)",
+  "source": "bilingual/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H1 bi − en, English (4B)",
+  "path": [
+   "primary",
+   "H1|safety|bi-en|en",
+   "g4b",
+   "estimate_pp"
+  ],
+  "value": -1.68,
+  "dp": 2,
+  "text": "| −1.68 |",
+  "source": "bilingual/results.json primary_g4b",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H1 bi − en, Japanese (4B)",
+  "path": [
+   "primary",
+   "H1|safety|bi-en|ja",
+   "g4b",
+   "estimate_pp"
+  ],
+  "value": -4.42,
+  "dp": 2,
+  "text": "| −4.42 |",
+  "source": "bilingual/results.json primary_g4b",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H3 bi − en2, English (4B)",
+  "path": [
+   "primary",
+   "H3|safety|bi-en2|en",
+   "g4b",
+   "estimate_pp"
+  ],
+  "value": -0.25,
+  "dp": 2,
+  "text": "| −0.25 |",
+  "source": "bilingual/results.json primary_g4b",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "H3 bi − en2, Japanese (4B)",
+  "path": [
+   "primary",
+   "H3|safety|bi-en2|ja",
+   "g4b",
+   "estimate_pp"
+  ],
+  "value": -5.69,
+  "dp": 2,
+  "text": "| −5.69 |",
+  "source": "bilingual/results.json primary_g4b",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja answer component, Japanese",
+  "path": [
+   "decomposition",
+   "ja|ja",
+   "from_answers_pp"
+  ],
+  "value": -2.05,
+  "dp": 2,
+  "text": "**−2.05**",
+  "source": "B5 logic re-run in A1 (matches B5_refusal_decomposition_out.ipynb)",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja answer component, English",
+  "path": [
+   "decomposition",
+   "ja|en",
+   "from_answers_pp"
+  ],
+  "value": -1.48,
+  "dp": 2,
+  "text": "**−1.48**",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "bi answer component, Japanese",
+  "path": [
+   "decomposition",
+   "bi|ja",
+   "from_answers_pp"
+  ],
+  "value": -0.35,
+  "dp": 2,
+  "text": "| −5.34 | −0.35 |",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "bi answer component, English",
+  "path": [
+   "decomposition",
+   "bi|en",
+   "from_answers_pp"
+  ],
+  "value": -0.12,
+  "dp": 2,
+  "text": "| −6.94 | −0.12 |",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja Unsafe among answered, Japanese",
+  "path": [
+   "decomposition",
+   "ja|ja",
+   "unsafe_given_answered_pct"
+  ],
+  "value": 17.24,
+  "dp": 2,
+  "text": "20.57% → 17.24%",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "bi Unsafe among answered, all prompts",
+  "path": [
+   "decomposition",
+   "bi|all",
+   "unsafe_given_answered_pct"
+  ],
+  "value": 18.09,
+  "dp": 2,
+  "text": "(18.1% vs 17.8% Unsafe)",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "base Unsafe among answered, all prompts",
+  "path": [
+   "decomposition",
+   "base|all",
+   "unsafe_given_answered_pct"
+  ],
+  "value": 17.84,
+  "dp": 2,
+  "text": "(18.1% vs 17.8% Unsafe)",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "ja rows refused and Unsafe",
+  "path": [
+   "decomposition",
+   "ja|all",
+   "refused_and_unsafe_rows"
+  ],
+  "value": 2,
+  "dp": 0,
+  "text": "only 2 of about 16,500",
+  "source": "B5 logic re-run in A1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Base Unsafe, US cue, English",
+  "path": [
+   "base_by_culture",
+   "us|en",
+   "pct"
+  ],
+  "value": 15.86,
+  "dp": 2,
+  "text": "15.9% (199/1,255)",
+  "source": "bilingual/results.json headline_g06 base",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Base Unsafe, Japan cue, English",
+  "path": [
+   "base_by_culture",
+   "japan|en",
+   "pct"
+  ],
+  "value": 6.68,
+  "dp": 2,
+  "text": "6.7% (89/1,333)",
+  "source": "bilingual/results.json headline_g06 base",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Base Unsafe, US cue, Japanese",
+  "path": [
+   "base_by_culture",
+   "us|ja",
+   "pct"
+  ],
+  "value": 20.23,
+  "dp": 2,
+  "text": "20.2% (268/1,325)",
+  "source": "bilingual/results.json headline_g06 base",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Base Unsafe, Japan cue, Japanese",
+  "path": [
+   "base_by_culture",
+   "japan|ja",
+   "pct"
+  ],
+  "value": 10.66,
+  "dp": 2,
+  "text": "10.7% (146/1,369)",
+  "source": "bilingual/results.json headline_g06 base",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E4 UK − US matched, English",
+  "path": [
+   "E4",
+   "E4|safety|base: uk_m-us_m|en",
+   "estimate_pp"
+  ],
+  "value": -0.25,
+  "dp": 2,
+  "text": "UK − US −0.25 pp, CI −2.93 to +2.46",
+  "source": "followups/results.json tests.E4",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E4 UK − US matched, Japanese",
+  "path": [
+   "E4",
+   "E4|safety|base: uk_m-us_m|ja",
+   "estimate_pp"
+  ],
+  "value": 1.43,
+  "dp": 2,
+  "text": "+1.43 pp, CI −2.14 to +4.96",
+  "source": "followups/results.json tests.E4",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E4 original − matched US, English",
+  "path": [
+   "E4",
+   "E4|safety|base: us-us_m (cue content)|en",
+   "estimate_pp"
+  ],
+  "value": 8.06,
+  "dp": 2,
+  "text": "+8.06 pp in English (CI +3.42 to +12.74)",
+  "source": "followups/results.json tests.E4",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E4 original − matched US, Japanese",
+  "path": [
+   "E4",
+   "E4|safety|base: us-us_m (cue content)|ja",
+   "estimate_pp"
+  ],
+  "value": 13.17,
+  "dp": 2,
+  "text": "+13.17 pp in\nJapanese (CI +7.97 to +18.76)",
+  "source": "followups/results.json tests.E4",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E3 ja2 − ja Unsafe, English",
+  "path": [
+   "followups",
+   "E3|safety|ja2-ja|us|en",
+   "estimate_pp"
+  ],
+  "value": -0.64,
+  "dp": 2,
+  "text": "−0.64 pp, CI −1.63 to +0.32",
+  "source": "followups/results.json tests.E3",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E3 half A ja − en Unsafe, English",
+  "path": [
+   "followups",
+   "E3|safety|ja_A-en_A|us|en",
+   "estimate_pp"
+  ],
+  "value": 1.86,
+  "dp": 2,
+  "text": "+1.9 and +2.0 pp",
+  "source": "followups/results.json tests.E3",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E3 half A ja − en over-refusal, English",
+  "path": [
+   "followups",
+   "E3|over_refusal|ja_A-en_A|us|en",
+   "estimate_pp"
+  ],
+  "value": -7.61,
+  "dp": 2,
+  "text": "−7.6 and −6.2 pp",
+  "source": "followups/results.json tests.E3",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E3 half B ja − en Unsafe, Japanese",
+  "path": [
+   "followups",
+   "E3|safety|ja_B-en_B|us|ja",
+   "estimate_pp"
+  ],
+  "value": -2.74,
+  "dp": 2,
+  "text": "−7.6 and −2.7 pp",
+  "source": "followups/results.json tests.E3",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Steering H1 English",
+  "path": [
+   "steering_primary",
+   "H1|en|g06",
+   "estimate_pp"
+  ],
+  "value": -5.78,
+  "dp": 2,
+  "text": "−5.78 (−6.89 to −4.76)",
+  "source": "steering/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Steering H2 English",
+  "path": [
+   "steering_primary",
+   "H2|en|g06",
+   "estimate_pp"
+  ],
+  "value": 1.46,
+  "dp": 2,
+  "text": "+1.46 (+0.89 to +2.10)",
+  "source": "steering/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "Steering H3 English",
+  "path": [
+   "steering_primary",
+   "H3|en|g06",
+   "estimate_pp"
+  ],
+  "value": -5.19,
+  "dp": 2,
+  "text": "−5.19 pp (222/308 → 206/308)",
+  "source": "steering/results.json primary_g06",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E1 over-refusal, English",
+  "path": [
+   "followups",
+   "E1|over_refusal|A*bi-bi|us|en",
+   "estimate_pp"
+  ],
+  "value": -5.68,
+  "dp": 2,
+  "text": "−5.68 (−8.39 to −3.02)",
+  "source": "followups/results.json tests.E1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E1 over-refusal, Japanese",
+  "path": [
+   "followups",
+   "E1|over_refusal|A*bi-bi|us|ja",
+   "estimate_pp"
+  ],
+  "value": 3.26,
+  "dp": 2,
+  "text": "+3.26 pp",
+  "source": "followups/results.json tests.E1",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E2 over-refusal, English",
+  "path": [
+   "followups",
+   "E2|over_refusal|bi_h2-bi|us|en",
+   "estimate_pp"
+  ],
+  "value": -7.91,
+  "dp": 2,
+  "text": "−7.91 (−11.29 to −4.47)",
+  "source": "followups/results.json tests.E2",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "E2 Unsafe, Japanese",
+  "path": [
+   "followups",
+   "E2|safety|bi_h2-bi|us|ja",
+   "estimate_pp"
+  ],
+  "value": 2.82,
+  "dp": 2,
+  "text": "+2.82 pp",
+  "source": "followups/results.json tests.E2",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "x_steer D layer 18 over-refusal, English",
+  "path": [
+   "interventions_en",
+   "Hook removal at layer 18 (x_steer D)",
+   "over_refusal_pp"
+  ],
+  "value": -14.97,
+  "dp": 2,
+  "text": "−14.97 (−18.58 to −11.42)",
+  "source": "x_steer/D/results.json rows",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "x_steer D layer 18 Unsafe, English",
+  "path": [
+   "interventions_en",
+   "Hook removal at layer 18 (x_steer D)",
+   "unsafe_pp"
+  ],
+  "value": 3.75,
+  "dp": 2,
+  "text": "+3.75 (+0.93 to +6.73)",
+  "source": "x_steer/D/results.json rows",
+  "pattern": null
+ },
+ {
+  "kind": "num",
+  "claim": "x_steer C over-refusal, English",
+  "path": [
+   "interventions_en",
+   "Harm-independent direction, layer 1 (x_steer C)",
+   "over_refusal_pp"
+  ],
+  "value": 0.72,
+  "dp": 2,
+  "text": "+0.72 (−1.09 to +2.72)",
+  "source": "x_steer/C/results.json tests",
+  "pattern": null
+ },
+ {
+  "kind": "src",
+  "claim": "x_steer A: cos(f_pooled_old, g) = 0.60 at L18",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "cosine 0.60",
+  "source": "post_train_3/x_steer/A/report.md",
+  "pattern": "at the steering layer L18 cos(f, g) = 0.60"
+ },
+ {
+  "kind": "src",
+  "claim": "x_steer A: f_bal vs h 0.78 at L18",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "cosine 0.73–0.78 at layer 18",
+  "source": "post_train_3/x_steer/A/report.md",
+  "pattern": "| en_s0 | **f_bal vs h** | +0.28 | +0.47 | +0.74 | +0.78 |"
+ },
+ {
+  "kind": "src",
+  "claim": "x_steer B: no layer qualifies",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "no layer was both readable",
+  "source": "post_train_3/x_steer/B/RESULTS.md",
+  "pattern": "no layer qualifies at any of the 36 layers"
+ },
+ {
+  "kind": "src",
+  "claim": "x_steer B: ja_s0 English twin refusals 99 → 285",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "(99 → 285 of 975)",
+  "source": "post_train_3/x_steer/B/RESULTS.md",
+  "pattern": "99 → 285 refused English twins"
+ },
+ {
+  "kind": "src",
+  "claim": "Steering quality check",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "118 edited wins, 104 unedited, 178 ties",
+  "source": "post_train_3/steering/report.md",
+  "pattern": "edited wins 118, unedited wins 104, ties 178"
+ },
+ {
+  "kind": "src",
+  "claim": "CAST on base, Unsafe",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "10.0% (131/1,314) to 6.8% (90/1,332)",
+  "source": "post_train_3/steering/report.md",
+  "pattern": "131/1314 (10.0%) | 90/1332 (6.8%)"
+ },
+ {
+  "kind": "src",
+  "claim": "CAST on base, over-refusal",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "4.4% (42/950) to 6.9% (66/950)",
+  "source": "post_train_3/steering/report.md",
+  "pattern": "42/950 (4.4%) | 66/950 (6.9%)"
+ },
+ {
+  "kind": "src",
+  "claim": "Pilot Unsafe counts",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "12/145 (8.3%)",
+  "source": "post_train_2/report.md",
+  "pattern": "8.3% (12/145)"
+ },
+ {
+  "kind": "src",
+  "claim": "Pilot over-refusal counts",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "29/80 (36.3%)",
+  "source": "post_train_2/report.md",
+  "pattern": "36.3% (29/80)"
+ },
+ {
+  "kind": "src",
+  "claim": "Japan cue: ninja share",
+  "path": null,
+  "value": null,
+  "dp": null,
+  "text": "ninja (25% of Japan-framed English prompts)",
+  "source": "japan_culture/chunks/*/prompts (count in this session: 387/1,543)",
+  "pattern": null
+ }
+]
