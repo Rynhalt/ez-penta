@@ -1,0 +1,13 @@
+{
+  "expected_assigned_prompts": 21184,
+  "unexpected_prompt_ids": 0,
+  "missing_assignment_count": 0,
+  "assigned": 21184,
+  "seeds": 320,
+  "duplicate_prompt_ids": 0,
+  "completed_answers": 17795,
+  "truncated_answers": 3387,
+  "completed_judgments": 13730,
+  "unknown_or_absent_safety": 7454,
+  "successful_full_evaluation": false
+}

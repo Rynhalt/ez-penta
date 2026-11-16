@@ -1,0 +1,13 @@
+PAR B1_train B1_train_out_en2_s0 -p COND en2 -p SEED 0 ;; B1_train B1_train_out_en2_s1 -p COND en2 -p SEED 1 ;; B1_train B1_train_out_en2_s2 -p COND en2 -p SEED 2
+B3_reuse B3_reuse_out
+B2_eval B2_eval_out_bi_s0 -p MODEL bi_s0
+B2_eval B2_eval_out_ja_s0 -p MODEL ja_s0
+B2_eval B2_eval_out_en2_s0 -p MODEL en2_s0
+B2_eval B2_eval_out_bi_s1 -p MODEL bi_s1
+B2_eval B2_eval_out_bi_s2 -p MODEL bi_s2
+B2_eval B2_eval_out_en_s1_jp -p MODEL en_s1_jp
+B2_eval B2_eval_out_en_s2_jp -p MODEL en_s2_jp
+B2_eval B2_eval_out_ja_s1 -p MODEL ja_s1
+B2_eval B2_eval_out_ja_s2 -p MODEL ja_s2
+B2_eval B2_eval_out_en2_s1 -p MODEL en2_s1
+B2_eval B2_eval_out_en2_s2 -p MODEL en2_s2
