@@ -16,44 +16,112 @@ ran on a T4, and pipeline 3 ran locally on CPU.
 
 ---
 
+## How results are reported
+
+Every answer gets two labels from Qwen3Guard-Gen-0.6B, judged on the model's **answer** (with the
+prompt as context): **Safe / Unsafe / Controversial**, and **refusal yes / no**. The judge never
+sees the prompt's category. The three metrics below combine those labels with the prompt type
+from dataset2:
+
+| Metric | Prompts it is measured on | Counted as a failure | Lower is better |
+|---|---|---|---|
+| **Safety** (unsafe rate) | All **harmful** prompts: clearly harmful + borderline, merged | The answer is labelled **Unsafe** | yes |
+| **Over-refusal** | **Harmless twins**: the harmless version of a harmful request | The answer is a **refusal** | yes |
+| **Over-caution** | **Borderline** ("answer carefully") harmful prompts | The answer is a **refusal** | yes |
+
+- **Safety** is about the answer's content: did the model say something harmful? Refusing or
+  not does not enter into it. Answers labelled `Controversial` (or unparseable) have no
+  safe/unsafe verdict and are left out of the denominator.
+- **Over-refusal** is refusing something plainly harmless.
+- **Over-caution** is refusing a sensitive but legitimate request that a careful assistant
+  should answer with care (safety information, context, a better alternative). It is a softer
+  signal than over-refusal: the borderline labels were assigned when dataset2 was generated and
+  have not been validated by a person, and some refusals of borderline prompts are defensible.
+- Refusing a **clearly harmful** prompt is the correct behaviour, so it is not a metric here.
+- A refusal flag alone does not prove a refusal was unnecessary; confirming that needs a human
+  check of the prompt. Treat over-refusal and over-caution as upper estimates.
+
+All numbers below are recomputed from the saved answers by
+[`recompute_three_metrics.py`](notebooks/recompute_three_metrics.py)
+(output: `notebooks/combined/three_metric_summary.json`).
+
+---
+
 ## 1. Headline result
 
-On 228 validation prompts whose seeds were never used to build the fix:
+On 228 validation prompts (English and Japanese) whose seeds were never used to build the fix:
 
-| | Baseline | Restricted LoRA (layer 18 `down_proj`) | Broad LoRA (all layers) |
+| | Prompts | Baseline | Restricted LoRA (layer 18 `down_proj`) | Broad LoRA (all layers) |
+|---|---|---|---|---|
+| **Safety**: unsafe answers | 148 harmful | 8.3% (12/145) | **0.7%** (1/147) | 0.7% (1/148) |
+| **Over-refusal**: refused | 80 harmless twins | 10.0% (8/80) | **20.0%** (16/80) | 36.3% (29/80) |
+| **Over-caution**: refused | 30 borderline | 30.0% (9/30) | 46.7% (14/30) | 43.3% (13/30) |
+| Average harmless-answer length | 80 harmless twins | 1,072 chars | 700 | 292 |
+
+All 12 unsafe baseline answers came from clearly harmful prompts; no model gave an unsafe answer
+to a borderline prompt. Safety denominators leave out `Controversial` answers (baseline 3,
+restricted 1, broad 0).
+
+Paired tests on the same prompts (exact McNemar; "better" = unsafe → safe or refused → answered):
+
+| Comparison vs baseline | Paired prompts | Better | Worse | p |
+|---|---|---|---|---|
+| Restricted, safety | 144 | 10 | 0 | **0.002** |
+| Broad, safety | 145 | 11 | 0 | 0.001 |
+| Restricted, over-refusal | 80 | 1 | 9 | 0.021 |
+| Broad, over-refusal | 80 | 1 | 22 | 0.00001 |
+| Restricted, over-caution | 30 | 0 | 5 | 0.062 |
+| Broad, over-caution | 30 | 0 | 4 | 0.12 |
+
+Restricted vs broad on the same prompts: equally safe (1 prompt each way), but the broad fix
+refuses 16 harmless twins the restricted fix answers, against 3 the other way (p = 0.004).
+On over-caution they barely differ (1 vs 0).
+
+Seed-level robustness (each source request is one unit; 10,000-sample seed bootstrap, sign test
+over seeds):
+
+| | Prompts / seeds | Change | 95% CI | Seeds down / up | p |
+|---|---|---|---|---|---|
+| Restricted, safety | 144 / 54 | −6.9 pts | −11.7 to −2.9 | 9 / 0 | 0.004 |
+| Broad, safety | 145 / 54 | −7.6 pts | −11.8 to −3.9 | 11 / 0 | 0.001 |
+| Restricted, over-refusal | 80 / 33 | +10.0 pts | +2.5 to +19.1 | 1 / 8 | 0.039 |
+| Broad, over-refusal | 80 / 33 | +26.3 pts | +17.1 to +36.2 | 0 / 16 | 0.00003 |
+| Restricted, over-caution | 30 / 13 | +16.7 pts | 0.0 to +34.2 | 0 / 3 | 0.25 |
+| Broad, over-caution | 30 / 13 | +13.3 pts | 0.0 to +26.7 | 0 / 3 | 0.25 |
+
+**In one sentence:** the circuit-restricted fix removes almost all unsafe answers, at the cost
+of doubling over-refusal (10% → 20%). The broad fix is no safer and over-refuses almost twice as
+much again, with much terser answers. **The restricted fix is the better trade-off.** Both fixes
+also increase over-caution, but with only 30 borderline prompts that change is not significant.
+
+### By language, culture and jailbreak technique
+
+| | Safety: baseline → restricted → broad | Over-refusal: baseline → restricted → broad | Over-caution: baseline → restricted → broad |
 |---|---|---|---|
-| Unsafe answers, harmful prompts the model should decline (n=118) | 10.4% | **0.9%** | 0.8% |
-| Refusals, harmful prompts it should answer carefully (n=30) | 30% | 47% | 43% |
-| **Needless refusals, harmless twin prompts (n=80)** | 10% | **20%** | 36% |
-| Average harmless-answer length | 1,071 chars | 699 | 291 |
+| English | 6.9% → 1.7% → 0.0% | 6.8% → 13.6% → 45.5% | 2/6 → 4/6 → 4/6 |
+| Japanese | 9.2% → 0.0% → 1.1% | 13.9% → 27.8% → 25.0% | 29.2% → 41.7% → 37.5% |
+| US culture | 13.9% → 1.4% → 1.4% | 10.0% → 22.5% → 45.0% | 26.7% → 46.7% → 40.0% |
+| Neutral culture | 2.7% → 0.0% → 0.0% | 10.0% → 17.5% → 27.5% | 33.3% → 46.7% → 46.7% |
+| Direct request | 13.5% → 1.9% → 1.9% | 8.3% → 19.4% → 30.6% | 1/10 → 4/10 → 3/10 |
+| Role-play | 3.6% → 0.0% → 0.0% | 3/12 → 4/12 → 4/12 | 8/10 → 10/10 → 10/10 |
+| Fiction | 3/15 → 0/15 → 0/16 | 0/18 → 0/18 → 8/18 | 0/2 → 0/2 → 0/2 |
+| Refusal suppression | 0/22 → 0/22 → 0/22 | 2/14 → 5/14 → 6/14 | 0/8 → 0/8 → 0/8 |
 
-Paired before/after tests on the same prompts (exact McNemar):
-
-| Comparison vs baseline | Got better | Got worse | p |
-|---|---|---|---|
-| Restricted, unsafe answers (harmful, n=144 paired) | 10 | 0 | **0.002** |
-| Broad, unsafe answers (harmful, n=145 paired) | 11 | 0 | 0.001 |
-| Restricted, needless refusals (twins, n=80) | 1 | 9 | 0.021 |
-| Broad, needless refusals (twins, n=80) | 1 | 22 | 0.00001 |
-
-**In one sentence:** the circuit-restricted fix removes almost all unsafe answers, and the
-cost is roughly doubling needless refusals (10% → 20%). The broad fix is no safer and
-over-refuses almost twice as much again, with much terser answers. **The restricted fix is the
-better trade-off.**
+Cells with fewer than 20 prompts are shown as counts.
 
 ### Did it close the US-vs-neutral culture gap?
 
-Yes, by removing nearly all unsafe answers in both conditions.
+Yes, by removing nearly all unsafe answers in both conditions (safety metric, harmful prompts).
 
 | Bucket "US unsafe / neutral safe" | Baseline | Restricted | Broad |
 |---|---|---|---|
-| US-framed prompts unsafe | 23.8% | 2.4% | 2.3% |
-| Neutral-framed prompts unsafe | 2.3% | 0% | 0% |
+| US-framed prompts unsafe | 23.8% (10/42) | 2.4% (1/42) | 2.3% (1/43) |
+| Neutral-framed prompts unsafe | 2.3% (1/43) | 0% (0/43) | 0% (0/43) |
 
-| Per-language harmful unsafe rate, US vs neutral | Baseline | Restricted | Broad |
+| Safety, US vs neutral | Baseline | Restricted | Broad |
 |---|---|---|---|
-| English | 10.7% vs 3.3% (gap 7.4 pp) | 3.4% vs 0% | 0% vs 0% |
-| Japanese | 15.9% vs 2.3% (gap 13.6 pp) | 0% vs 0% | 2.3% vs 0% |
+| English | 10.7% vs 3.3% (gap 7.4 pts) | 3.4% vs 0% | 0% vs 0% |
+| Japanese | 15.9% vs 2.3% (gap 13.6 pts) | 0% vs 0% | 2.3% vs 0% |
 
 The stratified Mantel–Haenszel culture odds ratio was **5.7 (p = 0.035)** at baseline on this
 set. After either fix it is undefined (p ≈ 1): almost no unsafe answers remain, so there is no
@@ -98,11 +166,11 @@ Validation pairs (each pair is the same request with US framing and with neutral
 | `us_safe_neutral_unsafe` | 14 (all available) | The reverse pattern |
 | `twin_probe` | 40 | Harmless twins, used only to measure over-refusal |
 
-The bucket labels come from the original dataset2 run, which sampled at temperature 0.2. This
-run uses greedy decoding, so the baseline does not reproduce them exactly: the target bucket
-is 23.8% unsafe here, not 100%. That is expected regression toward the mean. The paired
-before/after comparisons are unaffected, because all three models answer the same prompts the
-same way.
+The bucket labels come from the original dataset2 run, which used a 4-bit quantized model
+(GGUF Q4_K_M through llama.cpp, greedy decoding). This run uses the full-precision bf16 model
+through transformers, so the baseline does not reproduce those labels exactly: the target bucket
+is 23.8% unsafe here, not 100%. The paired before/after comparisons are unaffected, because all
+three models answer the same prompts with the same settings.
 
 ---
 
@@ -199,24 +267,29 @@ baseline. Nothing in it depends on the post_train_2 changes.
   - Labels: 666 Safe, 14 Unsafe, 4 Controversial, 0 unparseable.
   - Controversial answers are excluded from unsafe-rate denominators, so paired n is 144–145
     rather than 148.
-- **Results.** See section 1.
+- **Results.** See section 1 (safety, over-refusal and over-caution).
 - **Per-row data.** `pipeline5_answers.jsonl` holds every answer and verdict.
 
 ---
 
 ## 5. Interpretation and caveats
 
-- **The safety gain is real but rests on small counts.** Ten prompts flipped from unsafe to
-  safe and none flipped back (p = 0.002). Baseline Tiny Aya is already safe on most of these
-  prompts, so only about 11 unsafe answers were available to fix.
+- **The safety gain is real but rests on small counts.** Ten harmful prompts flipped from
+  unsafe to safe and none flipped back (p = 0.002; seed-level CI −11.7 to −2.9 points). Baseline
+  Tiny Aya is already safe on most of these prompts, so only 12 unsafe answers were available to
+  fix, all on clearly harmful prompts.
 - **Over-refusal is the main cost.**
-  - Twin refusals doubled under the restricted fix (10% → 20%) and more than tripled under the
-    broad one (→ 36%).
-  - It is uneven by language. English rose 7% → 14%, but Japanese rose **14% → 28%**.
-  - Prompts the model should answer carefully also drew more refusals (30% → 47%).
+  - It doubled under the restricted fix (10% → 20%) and more than tripled under the broad one
+    (→ 36.3%).
+  - It is uneven by language: English rose 6.8% → 13.6% and Japanese **13.9% → 27.8%**.
+- **Over-caution rose too, but is weakly measured.** Borderline prompts drew more refusals
+  (30% → 46.7% restricted, 43.3% broad), but with 30 prompts neither change is significant
+  (p = 0.062 and 0.12). For the restricted fix the extra refusals are on direct requests
+  (1/10 → 4/10) and role-play (8/10 → 10/10); fiction and refusal-suppression borderline prompts
+  were never refused by any model.
 - **Some "harmless twins" are borderline.** Several newly refused twins wrap a harmless
   question in jailbreak framing, for example an "unrestricted mafia assistant that never
-  refuses" persona. Refusing those is arguably acceptable, so the 20% overstates harmful
+  refuses" persona. Refusing those is arguably acceptable, so 20% overstates genuine
   over-refusal somewhat.
 - **Answers got shorter.** Harmless answers shrank by about a third under the restricted fix
   and by about three quarters under the broad fix. The guard does not measure helpfulness,
@@ -226,12 +299,14 @@ baseline. Nothing in it depends on the post_train_2 changes.
 
   | Restricted fix | Earlier iteration (refusals only) | This run (refusals + helpful) |
   |---|---|---|
-  | Needless refusals | 10% → 46% | 10% → 20% |
-  | "Answer carefully" prompts refused | 26% → 72% | 30% → 47% |
-  | Unsafe answers | 13% → 0% | 10.4% → 0.9% |
+  | Over-refusal | 10% → 46% | 10% → 20% |
+  | Over-caution | 26% → 72% | 30% → 46.7% |
+  | Unsafe answers, clearly harmful prompts only | 13% → 0% | 10.4% → 0.9% |
 
   The comparison is indicative only: the earlier iteration's validation set shared 42 seeds
-  with its training data and was a different prompt set.
+  with its training data and was a different prompt set. Its answers no longer exist, so its
+  unsafe rate cannot be recomputed with the merged safety metric; the last row uses the old
+  clearly-harmful-only definition for both runs.
 - **The guard is the only judge.** Qwen3Guard-0.6B decides "unsafe" and "refused". Its errors
   apply equally to all three models, so the paired comparisons are fair, but absolute rates
   inherit its biases.
@@ -261,9 +336,10 @@ baseline. Nothing in it depends on the post_train_2 changes.
 8. **Pipeline 1 was not rerun**; its full-dataset statistics are reused.
 9. **Hyperparameters** were kept from post_train_1 (1 epoch, lr 1e-4, batch 1) so the two
    runs stay comparable. Nothing was tuned on the validation set.
-10. **Decoding.** Validation uses greedy decoding with up to 512 new tokens, not the original
-    eval's temperature 0.2. This makes the arms directly comparable, but baseline rates
-    differ from dataset2's labels.
+10. **Decoding and precision.** Validation uses greedy decoding with up to 512 new tokens on
+    the full-precision bf16 model. The original dataset2 eval was also greedy, but on a 4-bit
+    GGUF (Q4_K_M) model through llama.cpp, so baseline rates differ from dataset2's labels.
+    All three arms here use identical settings, so they are directly comparable.
 11. **GPU.** G4 when available, T4 as fallback.
 
 ---
@@ -296,6 +372,7 @@ baseline. Nothing in it depends on the post_train_2 changes.
 | `notebooks/combined/pipeline4_results.json` | Training summary |
 | `notebooks/combined/pipeline4_adapters.zip` | Both LoRA adapters. **Local only:** 113 MB, over GitHub's 100 MB limit, so it is gitignored. Share it separately (Drive, Hugging Face) if teammates need it. |
 | `notebooks/combined/pipeline5_results.json`, `pipeline5_answers.jsonl` | All statistics; every answer and guard verdict |
+| `notebooks/recompute_three_metrics.py`, `notebooks/combined/three_metric_summary.json` | Recomputes every number in this report as safety / over-refusal / over-caution, from the saved answers |
 
 The build scripts also read `notebooks/combined/observations.csv` at the repo root (412 MB).
 That file is gitignored too, so anyone rerunning the prompt builders needs a copy of it.

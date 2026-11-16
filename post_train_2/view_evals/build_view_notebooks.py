@@ -36,37 +36,61 @@ def cells_for(name):
     c.append(md(f"""
 # View evals: **{name}** model
 
-This notebook runs {desc} on the 228 post_train_2 validation prompts, judges every answer with
-Qwen3Guard, and lets you read the results. It reproduces pipeline 5's `{name}` arm exactly:
+This notebook shows how {desc} did on the 228 post_train_2 validation prompts, and lets you try
+your own prompts on it.
+
+- **Sections 3–4 (stats and browsing)** use the answers and Qwen3Guard verdicts from the pipeline 5
+  run, loaded from `notebooks/combined/pipeline5_answers.jsonl`. Nothing is regenerated, so they need
+  no GPU and load in seconds.
+- **Section 5 (your own prompt)** loads the model on a GPU and answers with the same settings
+  pipeline 5 used:
 
 | Setting | Value (same as pipeline 5) |
 |---|---|
 | Decoding | Greedy (`do_sample=False`), which is temperature 0: always the single most likely next token |
 | Max new tokens | 512 |
-| Batch size | 8, prompts in the same order as pipeline 5 |
-| Prompt format | Tiny Aya's chat template, one user turn, left padding, prompt cut at 1,024 tokens |
+| Prompt format | Tiny Aya's chat template, one user turn, prompt cut at 1,024 tokens |
 | Precision | bfloat16, no quantization |
 | Judge | `Qwen/Qwen3Guard-Gen-0.6B`, bfloat16, greedy, 64 new tokens, no truncation |
 
 **Sections**
 1. Settings and file locations
-2. Generate and judge (skipped when `RUN_GENERATION = False`)
+2. Load pipeline 5's answers (or, optionally, regenerate all 228 with `RUN_GENERATION = True`)
 3. Stats: rates by prompt type, language, culture and jailbreak technique{', and the before/after tables against the original model' if is_fixed else ', and the US-vs-neutral gap'}
 4. Browse every prompt with its answer and category
+5. Try your own prompt: paste a prompt, get this model's answer and Qwen3Guard's verdict
 
-**How to run**
-- **With a GPU (Colab G4 or T4):** upload this notebook plus `pipeline5_validation_prompts_v2.json`{', `pipeline4_adapters.zip`' if is_fixed else ''} and (optional) `pipeline5_answers.jsonl`, choose a GPU runtime, add `HF_TOKEN` as a Colab secret, and run all. About 3–5 minutes on a G4, 15–20 on a T4.
-- **Without a GPU:** set `RUN_GENERATION = False` to skip generation and view the answers pipeline 5 already saved. All stats and browsing cells still work.
-{"- Run `eval_baseline.ipynb` first if you want the before/after tables to use your own fresh baseline run; otherwise they use pipeline 5's saved baseline answers." if is_fixed else ""}
+**How to run on Colab (files come from Google Drive)**
+1. Make sure the shared `ez-penta` folder is in your **My Drive**. If someone shared it with you, it
+   appears under "Shared with me": right-click it → **Organize → Add shortcut** → **My Drive**.
+   The notebook expects `MyDrive/ez-penta/post_train_2/...` (change `DRIVE_PROJECT_DIR` below if yours differs).
+2. **Run all.** Colab asks once to connect your Google Drive; allow it. Sections 1–4 work on any
+   runtime, including CPU.
+3. For section 5, switch to a GPU first (**Runtime → Change runtime type → GPU**: G4, or T4) and add
+   your Hugging Face token as a Colab secret named `HF_TOKEN` (key icon in the left sidebar, then turn
+   on "Notebook access"). Your Hugging Face account must have accepted the terms on the
+   [Tiny Aya Water page](https://huggingface.co/CohereLabs/tiny-aya-water): the base model is
+   downloaded from Hugging Face, not Drive.
+
+Files read from Drive: `notebooks/combined/pipeline5_answers.jsonl` (the saved answers),
+`notebooks/pipeline5_validation_prompts_v2.json`{', and for section 5 `notebooks/combined/pipeline4_adapters.zip` (the trained add-on, zipped or unzipped)' if is_fixed else ''}.
+Locally (not on Colab) the notebook reads the same files from the repo instead of Drive.
 """.replace("\n\n\n", "\n\n")))
 
     c.append(md("## 1. Settings"))
     c.append(code(f"""
 MODEL_NAME = "{name}"   # this notebook's model: "baseline", "restricted" or "broad"
 
-# True: load the model and generate fresh answers (needs a GPU).
-# False: no GPU; show the answers pipeline 5 saved for this model.
-RUN_GENERATION = True
+# False (default): use the answers and verdicts pipeline 5 saved for this model; no GPU needed.
+# True: regenerate and re-judge all 228 answers instead (needs a GPU, about 3-5 min on a G4).
+RUN_GENERATION = False
+
+# On Colab, project files are read from this Google Drive folder (a copy of the repo's ez-penta
+# folder, or at least its post_train_2 folder). Shared with you? Add a shortcut to My Drive first.
+DRIVE_PROJECT_DIR = "/content/drive/MyDrive/ez-penta"
+# False: save this run's answers on the Colab machine only (lost when the session ends).
+# True: save them to <DRIVE_PROJECT_DIR>/post_train_2/view_evals/outputs (needs edit access).
+SAVE_OUTPUTS_TO_DRIVE = False
 
 # Identical to pipeline 5. do_sample=False means greedy decoding (temperature 0).
 MAX_NEW_TOKENS = 512
@@ -92,12 +116,32 @@ import pandas as pd
 from IPython.display import HTML, display
 from scipy.stats import binomtest
 
-IN_COLAB = Path("/content").exists()
-# Works from post_train_2/view_evals in the repo, or with the files uploaded to /content on Colab.
-SEARCH_DIRS = [Path.cwd(), Path.cwd().parent / "notebooks", Path.cwd().parent / "notebooks" / "combined",
-               Path("/content")]
-OUT_DIR = Path("/content") if IN_COLAB else Path.cwd() / "outputs"
-OUT_DIR.mkdir(exist_ok=True)
+try:
+    import google.colab  # noqa: F401
+    IN_COLAB = True
+except ImportError:
+    IN_COLAB = False
+
+if IN_COLAB:
+    from google.colab import drive
+    drive.mount("/content/drive")
+    project = Path(DRIVE_PROJECT_DIR)
+    if not project.exists():
+        raise FileNotFoundError(
+            f"{project} does not exist. If the ez-penta folder was shared with you, open Google Drive, "
+            "right-click it under 'Shared with me' -> Organize -> Add shortcut -> My Drive, then rerun. "
+            "Otherwise set DRIVE_PROJECT_DIR to where the folder is.")
+    # Accept both Drive layouts: MyDrive/ez-penta/post_train_2/... or the post_train_2 contents directly.
+    bases = [project / "post_train_2", project]
+    OUT_DIR = (project / "post_train_2" / "view_evals" / "outputs" if SAVE_OUTPUTS_TO_DRIVE
+               else Path("/content/view_evals_outputs"))
+else:
+    # Running from post_train_2/view_evals inside the repo.
+    bases = [Path.cwd().parent]
+    OUT_DIR = Path.cwd() / "outputs"
+SEARCH_DIRS = [b / sub for b in bases for sub in ("notebooks", "notebooks/combined", "view_evals", "")]
+SEARCH_DIRS += [Path.cwd(), OUT_DIR]
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def find_file(name, required=True):
@@ -105,8 +149,7 @@ def find_file(name, required=True):
         if (d / name).exists():
             return d / name
     if required:
-        raise FileNotFoundError(f"{name} not found in {[str(d) for d in SEARCH_DIRS]}; "
-                                "upload it next to this notebook (or to /content on Colab).")
+        raise FileNotFoundError(f"{name} not found in any of: {[str(d) for d in SEARCH_DIRS]}")
     return None
 
 
@@ -119,11 +162,11 @@ print("outputs go to:", OUT_DIR)
 """))
 
     c.append(md("""
-## 2. Generate and judge
+## 2. Load the answers
 
-Loads the model (for the fixed models: the original model plus the trained LoRA adapter, merged),
-answers every prompt, frees the GPU, then loads Qwen3Guard to judge each answer for safety
-(`Safe` / `Unsafe` / `Controversial`) and refusal (`Yes` / `No`). Skipped when `RUN_GENERATION = False`.
+By default this loads pipeline 5's saved answers and Qwen3Guard verdicts for this model. It also
+defines the model-loading and generation helpers that section 5 uses; nothing is loaded onto the
+GPU until you run section 5 (or set `RUN_GENERATION = True` to regenerate all 228 answers).
 """))
     c.append(code("""
 import re
@@ -137,13 +180,26 @@ def parse_guard(text):
             "refused": 1 if (refusal and refusal.group(1) == "Yes") else (0 if refusal else None)}
 
 
-if RUN_GENERATION:
+_GEN_READY = False
+
+
+def setup_generation():
+    # Install/import the GPU libraries and log in to Hugging Face (runs once).
+    global torch, AutoModelForCausalLM, AutoTokenizer, device, _GEN_READY
+    if _GEN_READY:
+        return
     import subprocess
     import sys
     if IN_COLAB:
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "transformers", "accelerate", "peft"],
-                       check=True)
-    import gc
+        # Colab ships torchao 0.10, and current peft refuses to import next to torchao < 0.16, so
+        # upgrade it alongside peft (the same install pipeline 4 used when it trained the adapters).
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-U", "transformers", "accelerate",
+                        "peft", "torchao"], check=True)
+        import importlib
+        importlib.invalidate_caches()
+        if "peft" in sys.modules or "torchao" in sys.modules:
+            print("NOTE: peft/torchao were already imported in this session with the old versions. "
+                  "Use Runtime -> Restart session, then Run all.")
     import torch
     from huggingface_hub import login
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -162,42 +218,47 @@ if RUN_GENERATION:
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("device:", device)
     if device == "cpu":
-        print("WARNING: no GPU. Generation will take hours; consider RUN_GENERATION = False.")
+        print("WARNING: no GPU. Generation will be very slow.")
+    _GEN_READY = True
 
-    # Same helpers as pipeline 5.
-    def generate_answers(model, tokenizer, prompts, batch_size=GEN_BATCH_SIZE, max_new_tokens=MAX_NEW_TOKENS):
-        answers = []
-        for i in range(0, len(prompts), batch_size):
-            batch = prompts[i:i + batch_size]
-            texts = [tokenizer.apply_chat_template([{"role": "user", "content": p}], tokenize=False,
-                                                    add_generation_prompt=True) for p in batch]
-            enc = tokenizer(texts, return_tensors="pt", padding=True, truncation=True,
-                            max_length=PROMPT_MAX_TOKENS).to(device)
-            with torch.no_grad():
-                out = model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
-                                     pad_token_id=tokenizer.pad_token_id)
-            for j in range(len(batch)):
-                answers.append(tokenizer.decode(out[j][enc["input_ids"].shape[1]:], skip_special_tokens=True))
+
+# Same helpers as pipeline 5.
+def generate_answers(model, tokenizer, prompts, batch_size=GEN_BATCH_SIZE, max_new_tokens=MAX_NEW_TOKENS,
+                     verbose=True):
+    answers = []
+    for i in range(0, len(prompts), batch_size):
+        batch = prompts[i:i + batch_size]
+        texts = [tokenizer.apply_chat_template([{"role": "user", "content": p}], tokenize=False,
+                                                add_generation_prompt=True) for p in batch]
+        enc = tokenizer(texts, return_tensors="pt", padding=True, truncation=True,
+                        max_length=PROMPT_MAX_TOKENS).to(device)
+        with torch.no_grad():
+            out = model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
+                                 pad_token_id=tokenizer.pad_token_id)
+        for j in range(len(batch)):
+            answers.append(tokenizer.decode(out[j][enc["input_ids"].shape[1]:], skip_special_tokens=True))
+        if verbose:
             print(f"  answered {min(i + batch_size, len(prompts))}/{len(prompts)}")
-        return answers
+    return answers
 
-    def judge_answers(guard_model, guard_tokenizer, prompts, answers, batch_size=GUARD_BATCH_SIZE,
-                      max_new_tokens=GUARD_MAX_NEW_TOKENS):
-        verdicts = []
-        for i in range(0, len(prompts), batch_size):
-            batch_p, batch_a = prompts[i:i + batch_size], answers[i:i + batch_size]
-            texts = [guard_tokenizer.apply_chat_template(
-                [{"role": "user", "content": p}, {"role": "assistant", "content": a}],
-                tokenize=False, add_generation_prompt=False) for p, a in zip(batch_p, batch_a)]
-            # No truncation: cutting from the right would remove the guard's own instruction.
-            enc = guard_tokenizer(texts, return_tensors="pt", padding=True, truncation=False).to(device)
-            with torch.no_grad():
-                out = guard_model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
-                                           pad_token_id=guard_tokenizer.pad_token_id)
-            for j in range(len(batch_p)):
-                verdicts.append(parse_guard(guard_tokenizer.decode(out[j][enc["input_ids"].shape[1]:],
-                                                                   skip_special_tokens=True)))
-        return verdicts
+
+def judge_answers(guard_model, guard_tokenizer, prompts, answers, batch_size=GUARD_BATCH_SIZE,
+                  max_new_tokens=GUARD_MAX_NEW_TOKENS):
+    verdicts = []
+    for i in range(0, len(prompts), batch_size):
+        batch_p, batch_a = prompts[i:i + batch_size], answers[i:i + batch_size]
+        texts = [guard_tokenizer.apply_chat_template(
+            [{"role": "user", "content": p}, {"role": "assistant", "content": a}],
+            tokenize=False, add_generation_prompt=False) for p, a in zip(batch_p, batch_a)]
+        # No truncation: cutting from the right would remove the guard's own instruction.
+        enc = guard_tokenizer(texts, return_tensors="pt", padding=True, truncation=False).to(device)
+        with torch.no_grad():
+            out = guard_model.generate(**enc, max_new_tokens=max_new_tokens, do_sample=False,
+                                       pad_token_id=guard_tokenizer.pad_token_id)
+        for j in range(len(batch_p)):
+            raw = guard_tokenizer.decode(out[j][enc["input_ids"].shape[1]:], skip_special_tokens=True)
+            verdicts.append({**parse_guard(raw), "guard_output": raw.strip()})
+    return verdicts
 """))
     c.append(code("""
 def find_adapter(model_name):
@@ -206,39 +267,55 @@ def find_adapter(model_name):
         if (d / folder / "adapter_config.json").exists():
             return d / folder
     zip_path = find_file("pipeline4_adapters.zip")  # gitignored: copy it from whoever ran pipeline 4
+    # Unzip onto the machine's own disk, never into Drive (the broad adapter is 121MB).
+    unzip_dir = Path("/content/adapters") if IN_COLAB else Path.cwd() / "outputs"
+    print("unzipping", folder, "from", zip_path)
     with zipfile.ZipFile(zip_path) as z:
-        z.extractall(OUT_DIR, members=[m for m in z.namelist() if m.startswith(folder + "/")])
-    return OUT_DIR / folder
+        z.extractall(unzip_dir, members=[m for m in z.namelist() if m.startswith(folder + "/")])
+    return unzip_dir / folder
+
+
+_loaded = {}
+
+
+def get_eval_model():
+    # This notebook's model (loaded once, then reused).
+    if "model" not in _loaded:
+        setup_generation()
+        tok = AutoTokenizer.from_pretrained(MODEL_ID, padding_side="left")
+        if tok.pad_token_id is None:
+            tok.pad_token = tok.eos_token
+        mdl = AutoModelForCausalLM.from_pretrained(MODEL_ID, dtype=torch.bfloat16, device_map=device)
+        if MODEL_NAME != "baseline":
+            from peft import PeftModel
+            adapter_dir = find_adapter(MODEL_NAME)
+            print("applying adapter:", adapter_dir)
+            # Same operation pipeline 4 used to build the checkpoint pipeline 5 evaluated.
+            mdl = PeftModel.from_pretrained(mdl, str(adapter_dir)).merge_and_unload()
+        mdl.eval()
+        _loaded["model"] = (tok, mdl)
+    return _loaded["model"]
+
+
+def get_guard():
+    # Qwen3Guard (loaded once, then reused).
+    if "guard" not in _loaded:
+        setup_generation()
+        tok = AutoTokenizer.from_pretrained(GUARD_ID, padding_side="left")
+        if tok.pad_token_id is None:
+            tok.pad_token = tok.eos_token
+        mdl = AutoModelForCausalLM.from_pretrained(GUARD_ID, dtype=torch.bfloat16, device_map=device)
+        mdl.eval()
+        _loaded["guard"] = (tok, mdl)
+    return _loaded["guard"]
 
 
 if RUN_GENERATION:
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, padding_side="left")
-    if tokenizer.pad_token_id is None:
-        tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(MODEL_ID, dtype=torch.bfloat16, device_map=device)
-    if MODEL_NAME != "baseline":
-        from peft import PeftModel
-        adapter_dir = find_adapter(MODEL_NAME)
-        print("applying adapter:", adapter_dir)
-        # Same operation pipeline 4 used to build the checkpoint pipeline 5 evaluated.
-        model = PeftModel.from_pretrained(model, str(adapter_dir)).merge_and_unload()
-    model.eval()
-
+    tokenizer, model = get_eval_model()
     prompt_texts = [r["prompt"] for r in val_prompts]
     answers = generate_answers(model, tokenizer, prompt_texts)
-    del model
-    gc.collect()
-    torch.cuda.empty_cache()
-
-    guard_tokenizer = AutoTokenizer.from_pretrained(GUARD_ID, padding_side="left")
-    if guard_tokenizer.pad_token_id is None:
-        guard_tokenizer.pad_token = guard_tokenizer.eos_token
-    guard_model = AutoModelForCausalLM.from_pretrained(GUARD_ID, dtype=torch.bfloat16, device_map=device)
-    guard_model.eval()
+    guard_tokenizer, guard_model = get_guard()
     verdicts = judge_answers(guard_model, guard_tokenizer, prompt_texts, answers)
-    del guard_model
-    gc.collect()
-    torch.cuda.empty_cache()
 
     results = pd.DataFrame([{**r, "model": MODEL_NAME, "answer": a, **v}
                             for r, a, v in zip(val_prompts, answers, verdicts)])
@@ -246,15 +323,16 @@ if RUN_GENERATION:
     results.to_json(out_path, orient="records", lines=True, force_ascii=False)
     print("saved", out_path)
 else:
-    assert saved is not None, "RUN_GENERATION = False needs pipeline5_answers.jsonl"
+    assert saved is not None, ("pipeline5_answers.jsonl not found; it should be in "
+                               "post_train_2/notebooks/combined/ (on Drive or in the repo)")
     results = saved[saved["model"] == MODEL_NAME].reset_index(drop=True)
-    print(f"loaded {len(results)} saved pipeline 5 answers for {MODEL_NAME}")
+    print(f"loaded {len(results)} pipeline 5 answers for {MODEL_NAME} from {saved_path}")
 
 results["framing_name"] = results["framing"].map(FRAMING_NAMES)
 print(results["label"].value_counts().to_dict())
 """))
     c.append(md("""
-### Did this run reproduce pipeline 5?
+### Did this run reproduce pipeline 5? (only when `RUN_GENERATION = True`)
 
 Compares this run's answers with pipeline 5's saved answers for the same model. Greedy decoding is
 deterministic on the same hardware, but a different GPU type (G4 vs T4) can change a few low-level
@@ -270,7 +348,7 @@ if RUN_GENERATION and saved is not None:
     print(f"identical answer text: {same_text:.1%}   same safety label: {same_label:.1%}   "
           f"same refusal flag: {same_refusal:.1%}")
 else:
-    print("Skipped: needs a fresh run (RUN_GENERATION = True) and pipeline5_answers.jsonl.")
+    print("Skipped: these are pipeline 5's own answers (only checked when RUN_GENERATION = True).")
 """))
 
     c.append(md("""
@@ -354,8 +432,8 @@ Each prompt is answered by both models, so it falls into one of four boxes. Only
 boxes say whether the fix helped. The exact McNemar test asks: if the fix did nothing, changes
 would go either way like coin flips; how likely is a split this lopsided?
 
-The original model's answers come from `outputs/baseline_answers.jsonl` if you ran
-`eval_baseline.ipynb`, otherwise from pipeline 5's saved answers.
+The original model's answers come from pipeline 5's saved run (the same file), unless you
+regenerated them with `eval_baseline.ipynb` and `RUN_GENERATION = True`.
 """))
         c.append(code("""
 fresh_baseline = OUT_DIR / "baseline_answers.jsonl"
@@ -436,9 +514,13 @@ STYLE = ("<style>.ev td{{white-space:pre-wrap;vertical-align:top;text-align:left
 
 
 def show(df, cols=None, max_rows=None):
+    import html as _html
     df = df[cols or VIEW_COLS].head(max_rows) if max_rows else df[cols or VIEW_COLS]
-    html = df.to_html(index=False, escape=True, na_rep="-").replace("<table", '<table class="ev"', 1)
-    display(HTML(STYLE + html))
+    # Escape every value ourselves (untrusted text), then keep line breaks; pandas' own escaping
+    # would print them as a literal backslash-n.
+    safe = df.apply(lambda col: col.map(lambda v: "-" if pd.isna(v) else _html.escape(str(v)).replace("\\n", "<br>")))
+    table = safe.to_html(index=False, escape=False).replace("<table", '<table class="ev"', 1)
+    display(HTML(STYLE + table))
 
 
 def browse(max_rows=None, **filters):
@@ -473,6 +555,41 @@ show(pairs, cols=list(pairs.columns))
 """))
     c.append(md("### All 228 prompts"))
     c.append(code("""show(view)"""))
+    c.append(md("""
+## 5. Try your own prompt
+
+Paste a prompt between the quotes in `prompt = ""` and run the cell: this notebook's model answers
+it with the same settings as the evaluation (greedy / temperature 0, up to 512 new tokens, same chat
+template). Then run the judge cell below it. For a prompt with line breaks, use triple quotes:
+`prompt = \"\"\"...\"\"\"`.
+
+Needs a GPU. The first run loads the model (about a minute); after a full run it is already loaded.
+"""))
+    c.append(code("""
+prompt = ""
+
+if not prompt.strip():
+    my_answer = None
+    print("Paste your prompt between the quotes in prompt = \\"\\" and run this cell again.")
+else:
+    my_tokenizer, my_model = get_eval_model()
+    my_prompt = prompt
+    my_answer = generate_answers(my_model, my_tokenizer, [my_prompt], batch_size=1, verbose=False)[0]
+    print(f"[{MODEL_NAME} model]\\n")
+    print(my_answer)
+"""))
+    c.append(code("""
+# Qwen3Guard's verdict on the prompt + answer above.
+if globals().get("my_answer") is None:
+    print("No answer to judge yet: paste a prompt in the cell above and run it first.")
+else:
+    guard_tokenizer, guard_model = get_guard()
+    v = judge_answers(guard_model, guard_tokenizer, [my_prompt], [my_answer], batch_size=1)[0]
+    refusal = {1: "refusal", 0: "not a refusal"}.get(v["refused"], "unclear (guard gave no refusal line)")
+    print(f"Safety:  {v['label']}")
+    print(f"Refusal: {refusal}")
+    print("\\nRaw guard output:\\n" + v["guard_output"])
+"""))
     return c
 
 

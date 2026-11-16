@@ -1,0 +1,543 @@
+expected values <ArrowStringArray>
+['answer', 'decline', 'answer_carefully']
+Length: 3, dtype: str severity <ArrowStringArray>
+['clear', 'borderline']
+Length: 2, dtype: str
+
+### Missingness (no Safe/Unsafe label) by category, harmful, non-heldout
+category
+violent_crime              0.297
+self_harm_mental_health    0.315
+misinformation             0.329
+nonviolent_crime           0.355
+chatbot_interaction        0.378
+hate_discrimination        0.383
+sexual_content             0.384
+specialized_advice         0.387
+unsafe_activities          0.388
+privacy                    0.426
+Name: known, dtype: float64
+missing by framing {'control': 0.252, 'fc': 0.37, 'rp': 0.481, 'rs': 0.3}
+missing by lang {'en': 0.326, 'ja': 0.366, 'mix': 0.393}
+
+### GGUF baseline UNSAFE% harmful: category x framing (rate %, then n)
+framing                  control    fc    rp    rs
+category                                          
+chatbot_interaction          7.1  10.6  16.9   7.4
+hate_discrimination          1.6  10.3   9.3   0.9
+misinformation               4.9   4.5  22.3   7.7
+nonviolent_crime             7.8  22.2  20.9  16.5
+privacy                     11.8   7.1  20.6  10.8
+self_harm_mental_health      2.5   1.3   7.4   1.4
+sexual_content              25.2  26.0  32.3  15.8
+specialized_advice           6.7  11.9  15.1   2.9
+unsafe_activities            9.7  14.4  20.3  11.1
+violent_crime               13.9  15.8  19.4   9.4
+framing                  control   fc   rp   rs
+category                                       
+chatbot_interaction          126  179   83  162
+hate_discrimination          122  116  129  107
+misinformation               123  156  148  169
+nonviolent_crime             115  144  148  158
+privacy                      102  141  141  167
+self_harm_mental_health      121  158  148  146
+sexual_content               103  150  127   19
+specialized_advice           120  134  106  172
+unsafe_activities            113  146  118  171
+violent_crime                122  133  165  117
+
+### GGUF baseline OVER-REFUSAL% twins: category x framing (rate %, then n)
+framing                  control   fc    rp    rs
+category                                         
+chatbot_interaction         12.6  2.2   3.1   8.3
+hate_discrimination          3.8  1.8   4.3   5.8
+misinformation               5.6  3.2   3.7   6.5
+nonviolent_crime            11.7  2.9  21.6  10.9
+privacy                     12.9  4.4  19.1  12.3
+self_harm_mental_health      4.8  1.3   3.5   2.2
+sexual_content               9.8  1.1  11.8  12.1
+specialized_advice           3.7  0.7   2.5   1.8
+unsafe_activities            8.6  1.9   8.2   4.3
+violent_crime                6.7  0.0   4.8   1.2
+framing                  control   fc   rp   rs
+category                                       
+chatbot_interaction          135  184   97  192
+hate_discrimination          133  164  140  154
+misinformation               126  189  134  184
+nonviolent_crime             120  171  116  192
+privacy                      101  183  136  122
+self_harm_mental_health      124  159  142  180
+sexual_content               123  178  127   33
+specialized_advice           134  149  122  218
+unsafe_activities            128  160  122  208
+violent_crime                120  192  168  166
+
+### GGUF baseline UNSAFE% harmful: category x lang (rate %, then n)
+lang                       en    ja   mix
+category                                 
+chatbot_interaction       4.9  11.8  12.6
+hate_discrimination       2.4   4.5   9.8
+misinformation            5.8  14.1  10.1
+nonviolent_crime         14.1  17.3  19.6
+privacy                   6.5  16.5  13.5
+self_harm_mental_health   2.2   2.5   4.3
+sexual_content           27.6  27.3  27.0
+specialized_advice        7.4   9.3   8.7
+unsafe_activities        12.4  10.6  16.9
+violent_crime            13.6  19.3  12.9
+lang                      en   ja  mix
+category                              
+chatbot_interaction      182  161  207
+hate_discrimination      166  134  174
+misinformation           189  170  237
+nonviolent_crime         156  185  224
+privacy                  153  176  222
+self_harm_mental_health  185  157  231
+sexual_content           123  128  148
+specialized_advice       175  150  207
+unsafe_activities        178  151  219
+violent_crime            169  166  202
+
+### GGUF baseline OVER-REFUSAL% twins: category x lang (rate %, then n)
+lang                       en    ja   mix
+category                                 
+chatbot_interaction      10.9   5.4   3.8
+hate_discrimination       5.7   1.2   4.3
+misinformation            4.1   3.3   6.3
+nonviolent_crime         11.7  10.0  10.8
+privacy                   8.7  14.6  11.2
+self_harm_mental_health   5.1   1.8   1.7
+sexual_content            6.3   9.0   6.5
+specialized_advice        2.4   2.9   1.2
+unsafe_activities         4.9   8.0   3.7
+violent_crime             3.8   2.3   2.3
+lang                      en   ja  mix
+category                              
+chatbot_interaction      202  168  238
+hate_discrimination      192  168  231
+misinformation           197  183  253
+nonviolent_crime         179  180  240
+privacy                  161  158  223
+self_harm_mental_health  198  168  239
+sexual_content           159  133  169
+specialized_advice       205  173  245
+unsafe_activities        203  174  241
+violent_crime            208  174  264
+
+### GGUF baseline UNSAFE% harmful: category x culture (rate %, then n)
+culture                  japan  neutral    us
+category                                     
+chatbot_interaction       10.2      3.9  16.9
+hate_discrimination        1.2      4.3  12.9
+misinformation            11.9      6.8  11.1
+nonviolent_crime          15.9     15.2  20.8
+privacy                   10.9      9.5  18.8
+self_harm_mental_health    3.9      0.0   5.8
+sexual_content            16.9     26.5  37.7
+specialized_advice         6.2      4.5  15.3
+unsafe_activities         13.9      9.9  17.6
+violent_crime             15.0     13.3  16.9
+culture                  japan  neutral   us
+category                                    
+chatbot_interaction        177      207  166
+hate_discrimination        173      161  140
+misinformation             193      205  198
+nonviolent_crime           176      197  192
+privacy                    175      222  154
+self_harm_mental_health    205      195  173
+sexual_content             136      117  146
+specialized_advice         161      201  170
+unsafe_activities          187      191  170
+violent_crime              187      173  177
+
+### GGUF baseline OVER-REFUSAL% twins: category x culture (rate %, then n)
+culture                  japan  neutral    us
+category                                     
+chatbot_interaction        5.4      8.3   5.9
+hate_discrimination        0.9      9.0   1.7
+misinformation             1.9      7.5   4.8
+nonviolent_crime           7.3     18.7   4.8
+privacy                    7.2     11.8  15.1
+self_harm_mental_health    1.5      4.5   2.5
+sexual_content             4.5     10.2   7.1
+specialized_advice         2.8      2.5   0.9
+unsafe_activities          3.8      8.1   4.0
+violent_crime              1.4      4.7   2.3
+culture                  japan  neutral   us
+category                                    
+chatbot_interaction        204      218  186
+hate_discrimination        215      200  176
+misinformation             211      212  210
+nonviolent_crime           206      225  168
+privacy                    180      170  192
+self_harm_mental_health    203      201  201
+sexual_content             156      137  168
+specialized_advice         211      201  211
+unsafe_activities          211      209  198
+violent_crime              219      214  213
+
+### GGUF baseline UNSAFE% harmful: category x severity (rate %, then n)
+severity                 borderline  clear
+category                                  
+chatbot_interaction             1.0   20.3
+hate_discrimination             0.7   14.5
+misinformation                  2.0   18.3
+nonviolent_crime                7.2   29.1
+privacy                         2.8   18.8
+self_harm_mental_health         0.0    7.5
+sexual_content                 21.5   33.5
+specialized_advice              1.6   18.2
+unsafe_activities               1.7   26.8
+violent_crime                   6.7   24.3
+severity                 borderline  clear
+category                                  
+chatbot_interaction             299    251
+hate_discrimination             302    172
+misinformation                  306    290
+nonviolent_crime                304    261
+privacy                         215    336
+self_harm_mental_health         334    239
+sexual_content                  205    194
+specialized_advice              312    220
+unsafe_activities               287    261
+violent_crime                   282    255
+
+### GGUF baseline OVER-REFUSAL% twins: category x severity (rate %, then n)
+severity                 borderline  clear
+category                                  
+chatbot_interaction             6.0    7.2
+hate_discrimination             2.4    6.4
+misinformation                  2.8    6.8
+nonviolent_crime                2.8   20.1
+privacy                         7.7   14.6
+self_harm_mental_health         2.5    3.2
+sexual_content                  3.3   11.5
+specialized_advice              0.6    4.1
+unsafe_activities               0.7    9.5
+violent_crime                   0.0    5.0
+severity                 borderline  clear
+category                                  
+chatbot_interaction             332    276
+hate_discrimination             372    219
+misinformation                  325    308
+nonviolent_crime                320    279
+privacy                         247    295
+self_harm_mental_health         358    247
+sexual_content                  244    217
+specialized_advice              352    271
+unsafe_activities               292    326
+violent_crime                   289    357
+
+### GGUF baseline UNSAFE% harmful: category x form (rate %, then n)
+form                     instruction  question
+category                                      
+chatbot_interaction             14.9       5.0
+hate_discrimination              6.3       5.2
+misinformation                  13.7       6.7
+nonviolent_crime                24.2       7.7
+privacy                         14.4      11.0
+self_harm_mental_health          4.3       2.0
+sexual_content                  33.3      19.0
+specialized_advice              12.4       4.5
+unsafe_activities               17.2      10.2
+violent_crime                   16.0      14.2
+form                     instruction  question
+category                                      
+chatbot_interaction              269       281
+hate_discrimination              206       268
+misinformation                   270       326
+nonviolent_crime                 331       234
+privacy                          250       301
+self_harm_mental_health          280       293
+sexual_content                   231       168
+specialized_advice               266       266
+unsafe_activities                274       274
+violent_crime                    269       268
+
+### GGUF baseline OVER-REFUSAL% twins: category x form (rate %, then n)
+form                     instruction  question
+category                                      
+chatbot_interaction              7.7       5.5
+hate_discrimination              5.0       2.8
+misinformation                   6.9       2.5
+nonviolent_crime                14.3       6.6
+privacy                         16.0       7.9
+self_harm_mental_health          1.6       4.1
+sexual_content                  10.2       3.1
+specialized_advice               2.4       1.7
+unsafe_activities                8.5       2.7
+violent_crime                    1.7       3.7
+form                     instruction  question
+category                                      
+chatbot_interaction              298       310
+hate_discrimination              302       289
+misinformation                   317       316
+nonviolent_crime                 328       271
+privacy                          238       304
+self_harm_mental_health          315       290
+sexual_content                   266       195
+specialized_advice               332       291
+unsafe_activities                281       337
+violent_crime                    298       348
+
+### Over-caution% (refusal on harmful expected!=decline) by category x framing
+framing                  control   fc    rp    rs
+category                                         
+chatbot_interaction         17.1  0.0   7.1  12.5
+hate_discrimination          5.9  1.3   0.0   2.2
+misinformation               9.5  0.0   1.9   1.9
+nonviolent_crime             7.7  1.2  13.6   5.5
+privacy                     22.7  1.8  22.4  19.4
+self_harm_mental_health      6.3  0.0   1.4   2.0
+sexual_content              28.6  6.5  17.9  33.3
+specialized_advice           0.0  0.0   4.4   0.0
+unsafe_activities            1.8  0.0   1.9   1.1
+violent_crime                0.0  0.0   0.0   0.0
+framing                  control   fc  rp   rs
+category                                      
+chatbot_interaction           70   99  42   88
+hate_discrimination           68   79  66   89
+misinformation                63   86  54  103
+nonviolent_crime              65   82  66   91
+privacy                       44   55  49   67
+self_harm_mental_health       63  103  70   98
+sexual_content                49   77  67   12
+specialized_advice            71   78  45  118
+unsafe_activities             56   84  53   94
+violent_crime                 51   74  87   70
+
+### Output-category (Qwen3Guard) of UNSAFE answers: prompt category x output category (counts)
+out_cat                  Jailbreak  Non-violent Illegal Acts  None  PII  Politically Sensitive Topics  Sexual Content or Sexual Acts  Suicide & Self-Harm  Unethical Acts  Violent  All
+category                                                                                                                                                                               
+chatbot_interaction              2                        17     5    0                             0                              0                    0               0       30   54
+hate_discrimination              1                         0     2    0                             0                              1                    0              17        6   27
+misinformation                  13                         0     3    0                             3                              0                    0              35        5   59
+nonviolent_crime                 1                        81    13    0                             1                              0                    0               2        0   98
+privacy                          5                        39     7   15                             2                              0                    0               0        1   69
+self_harm_mental_health          2                         1     0    0                             0                              0                   11               4        0   18
+sexual_content                   2                         0     1    0                             0                            100                    0               6        0  109
+specialized_advice               4                        13     6    0                             0                              0                    0               2       20   45
+unsafe_activities                3                        25     7    0                             1                              1                    1               3       34   75
+violent_crime                    2                         0    12    0                             0                              1                    0               6       60   81
+All                             35                       176    56   15                             7                            103                   12              75      156  635
+
+row-normalised %
+out_cat                  Jailbreak  Non-violent Illegal Acts  None   PII  Politically Sensitive Topics  Sexual Content or Sexual Acts  Suicide & Self-Harm  Unethical Acts  Violent
+category                                                                                                                                                                           
+chatbot_interaction            4.0                      31.0   9.0   0.0                           0.0                            0.0                  0.0             0.0     56.0
+hate_discrimination            4.0                       0.0   7.0   0.0                           0.0                            4.0                  0.0            63.0     22.0
+misinformation                22.0                       0.0   5.0   0.0                           5.0                            0.0                  0.0            59.0      8.0
+nonviolent_crime               1.0                      83.0  13.0   0.0                           1.0                            0.0                  0.0             2.0      0.0
+privacy                        7.0                      57.0  10.0  22.0                           3.0                            0.0                  0.0             0.0      1.0
+self_harm_mental_health       11.0                       6.0   0.0   0.0                           0.0                            0.0                 61.0            22.0      0.0
+sexual_content                 2.0                       0.0   1.0   0.0                           0.0                           92.0                  0.0             6.0      0.0
+specialized_advice             9.0                      29.0  13.0   0.0                           0.0                            0.0                  0.0             4.0     44.0
+unsafe_activities              4.0                      33.0   9.0   0.0                           1.0                            1.0                  1.0             4.0     45.0
+violent_crime                  2.0                       0.0  15.0   0.0                           0.0                            1.0                  0.0             7.0     74.0
+
+Output category x framing (unsafe answers)
+framing                        control   fc   rp   rs  All
+out_cat                                                   
+Jailbreak                            0    0   28    7   35
+Non-violent Illegal Acts            28   53   53   42  176
+None                                11   14    7   24   56
+PII                                  0    3   10    2   15
+Politically Sensitive Topics         0    0    4    3    7
+Sexual Content or Sexual Acts       23   40   38    2  103
+Suicide & Self-Harm                  2    2    6    2   12
+Unethical Acts                       9   16   39   11   75
+Violent                             30   51   58   17  156
+All                                103  179  243  110  635
+
+Output category x language
+lang                            en   ja  mix  All
+out_cat                                          
+Jailbreak                        8   10   17   35
+Non-violent Illegal Acts        35   64   77  176
+None                            16   18   22   56
+PII                              2    5    8   15
+Politically Sensitive Topics     2    1    4    7
+Sexual Content or Sexual Acts   31   34   38  103
+Suicide & Self-Harm              2    3    7   12
+Unethical Acts                  14   25   36   75
+Violent                         42   51   63  156
+All                            152  211  272  635
+
+Output category x culture
+culture                        japan  neutral   us  All
+out_cat                                                
+Jailbreak                         12        8   15   35
+Non-violent Illegal Acts          52       50   74  176
+None                              28        7   21   56
+PII                                3        4    8   15
+Politically Sensitive Topics       2        0    5    7
+Sexual Content or Sexual Acts     19       32   52  103
+Suicide & Self-Harm                4        1    7   12
+Unethical Acts                    20       23   32   75
+Violent                           45       37   74  156
+All                              185      162  288  635
+
+Unsafe answers on TWINS (harmless prompts) by category / out_cat
+out_cat                  Jailbreak  Non-violent Illegal Acts  None  PII  Politically Sensitive Topics  Sexual Content or Sexual Acts  Suicide & Self-Harm  Unethical Acts  Violent  All
+category                                                                                                                                                                               
+chatbot_interaction              2                        13     4    0                             0                              0                    0               0        0   19
+hate_discrimination              0                         0     3    0                             0                              0                    0               5        0    8
+misinformation                   9                         0     5    0                             0                              0                    0               9        3   26
+nonviolent_crime                 4                        24     4    0                             3                              0                    0               2        0   37
+privacy                          1                         4     5   23                             1                              2                    0               0        0   36
+self_harm_mental_health          0                         0     0    0                             0                              0                    0               0        1    1
+sexual_content                   1                         0     2    0                             3                             24                    0               0        0   30
+specialized_advice               1                        11     7    0                             0                              0                    0               7        1   27
+unsafe_activities                0                         0    11    0                             0                              0                    1               0       27   39
+violent_crime                    0                         0     2    0                             1                              2                    0               0       11   16
+All                             18                        52    43   23                             8                             28                    1              23       43  239
+
+### Paired within-seed contrasts (a_worse = pair where a fails and b does not)
+      metric         contrast                category  pairs  a_rate  b_rate  a_worse  b_worse      p  seeds
+      unsafe    rp vs control     chatbot_interaction     37    16.2    13.5        1        0 1.0000     26
+      unsafe    rp vs control     hate_discrimination     55     5.5     3.6        2        1 1.0000     26
+      unsafe    rp vs control          misinformation     57    14.0     5.3        5        0 0.0625     26
+      unsafe    rp vs control        nonviolent_crime     60    20.0     8.3        8        1 0.0391     26
+      unsafe    rp vs control                 privacy     52    13.5    15.4        2        3 1.0000     26
+      unsafe    rp vs control self_harm_mental_health     62     4.8     3.2        2        1 1.0000     26
+      unsafe    rp vs control          sexual_content     42    23.8    31.0        5        8 0.5811     26
+      unsafe    rp vs control      specialized_advice     48    10.4    14.6        2        4 0.6875     26
+      unsafe    rp vs control       unsafe_activities     47    14.9    12.8        1        0 1.0000     26
+      unsafe    rp vs control           violent_crime     74    16.2     8.1        7        1 0.0703     26
+      unsafe    rp vs control                     ALL    534    13.7    10.7       35       19 0.0402    260
+      unsafe    fc vs control     chatbot_interaction     77     7.8     6.5        3        2 1.0000     26
+      unsafe    fc vs control     hate_discrimination     49     6.1     0.0        3        0 0.2500     26
+      unsafe    fc vs control          misinformation     65     4.6     3.1        3        2 1.0000     26
+      unsafe    fc vs control        nonviolent_crime     51    19.6     3.9        8        0 0.0078     26
+      unsafe    fc vs control                 privacy     50    10.0     6.0        4        2 0.6875     26
+      unsafe    fc vs control self_harm_mental_health     68     1.5     2.9        1        2 1.0000     26
+      unsafe    fc vs control          sexual_content     53    22.6    22.6        9        9 1.0000     26
+      unsafe    fc vs control      specialized_advice     52     9.6     5.8        2        0 0.5000     26
+      unsafe    fc vs control       unsafe_activities     51     9.8     5.9        3        1 0.6250     26
+      unsafe    fc vs control           violent_crime     57    19.3     7.0        9        2 0.0654     26
+      unsafe    fc vs control                     ALL    573    10.6     6.3       45       20 0.0026    260
+      unsafe    rs vs control     chatbot_interaction     75     6.7     6.7        3        3 1.0000     26
+      unsafe    rs vs control     hate_discrimination     47     0.0     0.0        0        0 1.0000     26
+      unsafe    rs vs control          misinformation     73     5.5     2.7        2        0 0.5000     26
+      unsafe    rs vs control        nonviolent_crime     75    12.0     9.3        3        1 0.6250     26
+      unsafe    rs vs control                 privacy     77    10.4    10.4        2        2 1.0000     26
+      unsafe    rs vs control self_harm_mental_health     62     0.0     0.0        0        0 1.0000     26
+      unsafe    rs vs control          sexual_content      9    11.1     0.0        1        0 1.0000     26
+      unsafe    rs vs control      specialized_advice     73     1.4     2.7        0        1 1.0000     26
+      unsafe    rs vs control       unsafe_activities     76     7.9     5.3        3        1 0.6250     26
+      unsafe    rs vs control           violent_crime     49     8.2     6.1        3        2 1.0000     26
+      unsafe    rs vs control                     ALL    616     6.2     5.0       17       10 0.2478    260
+      unsafe    us vs neutral     chatbot_interaction    121    12.4     4.1       10        0 0.0020     26
+      unsafe    us vs neutral     hate_discrimination     86    11.6     7.0        7        3 0.3438     26
+      unsafe    us vs neutral          misinformation    136     9.6     5.9        9        4 0.2668     26
+      unsafe    us vs neutral        nonviolent_crime    126    19.8     9.5       16        3 0.0044     26
+      unsafe    us vs neutral                 privacy    115    18.3    11.3       13        5 0.0963     26
+      unsafe    us vs neutral self_harm_mental_health    124     4.8     0.0        6        0 0.0312     26
+      unsafe    us vs neutral          sexual_content     63    28.6    25.4        6        4 0.7539     26
+      unsafe    us vs neutral      specialized_advice    114     9.6     3.5        8        1 0.0391     26
+      unsafe    us vs neutral       unsafe_activities    118    17.8     8.5       15        4 0.0192     26
+      unsafe    us vs neutral           violent_crime    104    17.3     5.8       15        3 0.0075     26
+      unsafe    us vs neutral                     ALL   1107    14.3     7.2      105       27 0.0000    260
+      unsafe japan vs neutral     chatbot_interaction    120     5.8     4.2        4        2 0.6875     26
+      unsafe japan vs neutral     hate_discrimination    107     0.0     3.7        0        4 0.1250     26
+      unsafe japan vs neutral          misinformation    119    13.4     5.0       11        1 0.0063     26
+      unsafe japan vs neutral        nonviolent_crime    105    13.3     8.6       13        8 0.3833     26
+      unsafe japan vs neutral                 privacy    121    12.4    10.7       10        8 0.8145     26
+      unsafe japan vs neutral self_harm_mental_health    141     4.3     0.0        6        0 0.0312     26
+      unsafe japan vs neutral          sexual_content     67    19.4    23.9        6        9 0.6072     26
+      unsafe japan vs neutral      specialized_advice    128     4.7     4.7        6        6 1.0000     26
+      unsafe japan vs neutral       unsafe_activities    112    15.2     9.8       11        5 0.2101     26
+      unsafe japan vs neutral           violent_crime    113    15.9     8.8       13        5 0.0963     26
+      unsafe japan vs neutral                     ALL   1133     9.9     7.1       80       48 0.0059    260
+      unsafe         ja vs en     chatbot_interaction    138    12.3     5.8       11        2 0.0225     26
+      unsafe         ja vs en     hate_discrimination    112     2.7     0.9        3        1 0.6250     26
+      unsafe         ja vs en          misinformation    133    10.5     6.8       10        5 0.3018     26
+      unsafe         ja vs en        nonviolent_crime    128    16.4    14.1        7        4 0.5488     26
+      unsafe         ja vs en                 privacy    115    11.3     6.1       10        4 0.1796     26
+      unsafe         ja vs en self_harm_mental_health    132     1.5     3.0        1        3 0.6250     26
+      unsafe         ja vs en          sexual_content     82    17.1    25.6        4       11 0.1185     26
+      unsafe         ja vs en      specialized_advice    117     4.3     6.8        2        5 0.4531     26
+      unsafe         ja vs en       unsafe_activities    121     5.0     9.1        3        8 0.2266     26
+      unsafe         ja vs en           violent_crime    134    14.9    12.7        9        6 0.6072     26
+      unsafe         ja vs en                     ALL   1212     9.5     8.6       60       49 0.3382    260
+over_refusal    rp vs control     chatbot_interaction     43     4.7    16.3        1        6 0.1250     26
+over_refusal    rp vs control     hate_discrimination     67     3.0     3.0        0        0 1.0000     26
+over_refusal    rp vs control          misinformation     49     0.0     0.0        0        0 1.0000     26
+over_refusal    rp vs control        nonviolent_crime     48    18.8    25.0        2        5 0.4531     26
+over_refusal    rp vs control                 privacy     44    11.4     6.8        3        1 0.6250     26
+over_refusal    rp vs control self_harm_mental_health     65     3.1     3.1        1        1 1.0000     26
+over_refusal    rp vs control          sexual_content     51     9.8    13.7        2        4 0.6875     26
+over_refusal    rp vs control      specialized_advice     57     1.8     3.5        0        1 1.0000     26
+over_refusal    rp vs control       unsafe_activities     61     6.6     6.6        1        1 1.0000     26
+over_refusal    rp vs control           violent_crime     69     2.9     4.3        0        1 1.0000     26
+over_refusal    rp vs control                     ALL    554     5.8     7.6       10       20 0.0987    260
+over_refusal    fc vs control     chatbot_interaction     86     2.3    12.8        1       10 0.0117     26
+over_refusal    fc vs control     hate_discrimination     67     1.5     1.5        1        1 1.0000     26
+over_refusal    fc vs control          misinformation     79     1.3     6.3        1        5 0.2188     26
+over_refusal    fc vs control        nonviolent_crime     74     4.1     9.5        0        4 0.1250     26
+over_refusal    fc vs control                 privacy     68     1.5     7.4        0        4 0.1250     26
+over_refusal    fc vs control self_harm_mental_health     66     3.0     3.0        1        1 1.0000     26
+over_refusal    fc vs control          sexual_content     75     1.3    13.3        0        9 0.0039     26
+over_refusal    fc vs control      specialized_advice     64     1.6     1.6        0        0 1.0000     26
+over_refusal    fc vs control       unsafe_activities     64     1.6     6.2        1        4 0.3750     26
+over_refusal    fc vs control           violent_crime     74     0.0     4.1        0        3 0.2500     26
+over_refusal    fc vs control                     ALL    717     1.8     6.8        5       41 0.0000    260
+over_refusal    rs vs control     chatbot_interaction     88    10.2    10.2        4        4 1.0000     26
+over_refusal    rs vs control     hate_discrimination     70     5.7     2.9        2        0 0.5000     26
+over_refusal    rs vs control          misinformation     75     5.3     6.7        2        3 1.0000     26
+over_refusal    rs vs control        nonviolent_crime     79    10.1    10.1        1        1 1.0000     26
+over_refusal    rs vs control                 privacy     54    11.1    11.1        2        2 1.0000     26
+over_refusal    rs vs control self_harm_mental_health     82     2.4     1.2        2        1 1.0000     26
+over_refusal    rs vs control          sexual_content     15    13.3    26.7        0        2 0.5000     26
+over_refusal    rs vs control      specialized_advice     95     2.1     2.1        1        1 1.0000     26
+over_refusal    rs vs control       unsafe_activities     97     5.2     6.2        1        2 1.0000     26
+over_refusal    rs vs control           violent_crime     72     1.4     4.2        0        2 0.5000     26
+over_refusal    rs vs control                     ALL    727     5.9     6.3       15       18 0.7283    260
+over_refusal    us vs neutral     chatbot_interaction    127     7.1     9.4        6        9 0.6072     26
+over_refusal    us vs neutral     hate_discrimination    104     0.0     9.6        0       10 0.0020     26
+over_refusal    us vs neutral          misinformation    141     3.5     6.4        4        8 0.3877     26
+over_refusal    us vs neutral        nonviolent_crime    121     5.0    14.9        3       15 0.0075     26
+over_refusal    us vs neutral                 privacy    121     7.4    12.4        4       10 0.1796     26
+over_refusal    us vs neutral self_harm_mental_health    137     1.5     5.8        1        7 0.0703     26
+over_refusal    us vs neutral          sexual_content     86     8.1     9.3        2        3 1.0000     26
+over_refusal    us vs neutral      specialized_advice    143     0.7     3.5        1        5 0.2188     26
+over_refusal    us vs neutral       unsafe_activities    145     1.4     9.0        1       12 0.0034     26
+over_refusal    us vs neutral           violent_crime    137     2.9     5.1        1        4 0.3750     26
+over_refusal    us vs neutral                     ALL   1262     3.6     8.3       23       83 0.0000    260
+over_refusal japan vs neutral     chatbot_interaction    145     6.2     7.6        5        7 0.7744     26
+over_refusal japan vs neutral     hate_discrimination    130     0.8     7.7        1       10 0.0117     26
+over_refusal japan vs neutral          misinformation    136     2.2     7.4        3       10 0.0923     26
+over_refusal japan vs neutral        nonviolent_crime    140     5.0    12.9        4       15 0.0192     26
+over_refusal japan vs neutral                 privacy    103     3.9     7.8        3        7 0.3438     26
+over_refusal japan vs neutral self_harm_mental_health    129     1.6     3.9        1        4 0.3750     26
+over_refusal japan vs neutral          sexual_content     84     6.0    11.9        1        6 0.1250     26
+over_refusal japan vs neutral      specialized_advice    144     3.5     2.8        5        4 1.0000     26
+over_refusal japan vs neutral       unsafe_activities    144     0.7     7.6        1       11 0.0063     26
+over_refusal japan vs neutral           violent_crime    140     2.1     2.9        3        4 1.0000     26
+over_refusal japan vs neutral                     ALL   1295     3.1     7.0       27       78 0.0000    260
+over_refusal         ja vs en     chatbot_interaction    150     4.7    10.7        4       13 0.0490     26
+over_refusal         ja vs en     hate_discrimination    140     1.4     6.4        0        7 0.0156     26
+over_refusal         ja vs en          misinformation    146     3.4     4.1        4        5 1.0000     26
+over_refusal         ja vs en        nonviolent_crime    136     9.6    12.5        3        7 0.3438     26
+over_refusal         ja vs en                 privacy    110     5.5     7.3        5        7 0.7744     26
+over_refusal         ja vs en self_harm_mental_health    151     2.0     4.6        2        6 0.2891     26
+over_refusal         ja vs en          sexual_content    104     2.9     8.7        1        7 0.0703     26
+over_refusal         ja vs en      specialized_advice    158     3.2     1.3        3        0 0.2500     26
+over_refusal         ja vs en       unsafe_activities    153     7.2     5.9        5        3 0.7266     26
+over_refusal         ja vs en           violent_crime    154     2.6     2.6        2        2 1.0000     26
+over_refusal         ja vs en                     ALL   1402     4.2     6.2       29       57 0.0034    260
+
+### Prompt pool sizes per category (all splits): harmful / twin, seeds
+                         prompts                 seeds             
+split                   analysis heldout tune analysis heldout tune
+category                                                           
+chatbot_interaction         1096     464  680       16       6   10
+hate_discrimination          948     412  700       16       6   10
+misinformation              1136     396  708       16       6   10
+nonviolent_crime            1060     452  700       16       6   10
+privacy                     1188     456  732       16       6   10
+self_harm_mental_health      972     388  716       16       6   10
+sexual_content               796     316  564       16       6   10
+specialized_advice          1044     408  676       16       6   10
+unsafe_activities           1076     384  688       16       6   10
+violent_crime               1036     376  616       16       6   10
